@@ -1,0 +1,27 @@
+name = "buildmate-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-07"
+compatibility_flags = ["nodejs_compat"]
+
+# Development settings
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Environment variables (non-secret)
+[vars]
+ENVIRONMENT = "development"
+GEMINI_MODEL = "gemini-2.5-flash-lite-preview-06-2025"
+GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
+APP_VERSION = "1.0.0"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "buildmate-db"
+database_id = "101562c3-66d7-4c5a-a86a-b8b921ab34b1"
+
+# Production environment
+[env.production]
+name = "buildmate-api"
+vars = { ENVIRONMENT = "production", GEMINI_MODEL = "gemini-2.5-flash-lite-preview-06-2025", GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta", APP_VERSION = "1.0.0" }
