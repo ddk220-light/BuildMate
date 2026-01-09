@@ -12,3 +12,4 @@ export { ProductCard } from "./ProductCard";
 export type { ProductOption } from "./ProductCard";
 export { ProgressStepper } from "./ProgressStepper";
 export { StepNavigation } from "./StepNavigation";
+export { AssemblyGuide } from "./AssemblyGuide";

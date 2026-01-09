@@ -13,6 +13,9 @@ import {
   buildContextFromDatabase,
   getCachedOptions,
   saveShownOptions,
+  InstructionGenerator,
+  buildInstructionContext,
+  getCachedInstructions,
 } from "../lib/agents";
 
 // Create router with typed bindings
@@ -607,42 +610,185 @@ routes.post("/builds/:id/step/:n/select", async (c) => {
  * Complete Build
  * POST /api/builds/:id/complete
  *
- * Marks the build as complete
+ * Marks the build as complete after verifying all components are selected
  */
 routes.post("/builds/:id/complete", async (c) => {
+  const env = c.env;
   const buildId = c.req.param("id");
 
-  // TODO: Implement completion logic
-  // For now, return a stub response
-  return c.json(
-    {
-      message: "Completion not yet implemented",
+  try {
+    // 1. Fetch build
+    const build = await env.DB.prepare("SELECT * FROM builds WHERE id = ?")
+      .bind(buildId)
+      .first();
+
+    if (!build) {
+      return c.json(
+        {
+          error: {
+            code: "NOT_FOUND",
+            message: "Build not found",
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        404,
+      );
+    }
+
+    // 2. Verify all items are selected
+    const items = await env.DB.prepare(
+      "SELECT * FROM build_items WHERE build_id = ? AND product_name IS NOT NULL",
+    )
+      .bind(buildId)
+      .all();
+
+    if (items.results.length < 3) {
+      return c.json(
+        {
+          error: {
+            code: "INCOMPLETE",
+            message:
+              "All 3 components must be selected before completing the build",
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        400,
+      );
+    }
+
+    // 3. Update to completed if not already
+    let completedAt = build.completed_at as string | null;
+    if (build.status !== "completed") {
+      await env.DB.prepare(
+        "UPDATE builds SET status = 'completed', completed_at = datetime('now'), updated_at = datetime('now') WHERE id = ?",
+      )
+        .bind(buildId)
+        .run();
+      completedAt = new Date().toISOString();
+    }
+
+    // 4. Calculate total cost
+    const totalCost = items.results.reduce(
+      (sum, item) => sum + ((item.product_price as number) || 0),
+      0,
+    );
+
+    // 5. Return confirmation
+    return c.json({
       buildId,
+      status: "completed",
+      completedAt,
+      totalCost,
+      itemCount: items.results.length,
       requestId: c.get("requestId"),
-    },
-    501,
-  );
+    });
+  } catch (error) {
+    console.error("Error completing build:", error);
+    return c.json(
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to complete build",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
+  }
 });
 
 /**
  * Get Assembly Instructions
  * GET /api/builds/:id/instructions
  *
- * Returns the AI-generated assembly guide
+ * Returns the AI-generated assembly guide for a completed build.
+ * Caches instructions after first generation.
  */
 routes.get("/builds/:id/instructions", async (c) => {
+  const env = c.env;
   const buildId = c.req.param("id");
 
-  // TODO: Implement Instruction Generator agent call
-  // For now, return a stub response
-  return c.json(
-    {
-      message: "Instruction generation not yet implemented",
+  try {
+    // 1. Check for cached instructions first
+    const cached = await getCachedInstructions(env.DB, buildId);
+    if (cached) {
+      return c.json({
+        buildId,
+        instructions: cached,
+        cached: true,
+        latencyMs: 0,
+        requestId: c.get("requestId"),
+      });
+    }
+
+    // 2. Build context from completed build
+    const contextResult = await buildInstructionContext(env.DB, buildId);
+    if (!contextResult.success) {
+      return c.json(
+        {
+          error: {
+            code:
+              contextResult.statusCode === 404 ? "NOT_FOUND" : "BAD_REQUEST",
+            message: contextResult.error,
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        contextResult.statusCode as 400 | 404,
+      );
+    }
+
+    // 3. Generate instructions using AI
+    const generator = new InstructionGenerator(
+      env.GEMINI_API_KEY,
+      env.GEMINI_MODEL,
+      env.DB,
+      env.GEMINI_API_BASE_URL,
+    );
+
+    const result = await generator.generate({
+      context: contextResult.context,
+    });
+
+    if (!result.success) {
+      return c.json(
+        {
+          error: {
+            code: "AI_ERROR",
+            message: result.error || "Failed to generate instructions",
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        500,
+      );
+    }
+
+    // 4. Return the generated instructions
+    return c.json({
       buildId,
+      instructions: result.data,
+      cached: false,
+      latencyMs: result.latencyMs,
       requestId: c.get("requestId"),
-    },
-    501,
-  );
+    });
+  } catch (error) {
+    console.error("Error generating instructions:", error);
+    return c.json(
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to generate assembly instructions",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
+  }
 });
 
 /**

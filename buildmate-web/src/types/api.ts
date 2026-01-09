@@ -9,7 +9,7 @@ export interface Build {
     min: number;
     max: number;
   };
-  status: 'in_progress' | 'completed' | 'abandoned';
+  status: "in_progress" | "completed" | "abandoned";
   currentStep: number;
   structure: BuildStructure | null;
   createdAt: string;
@@ -57,7 +57,7 @@ export interface ProductOption {
   compatibilityNote: string;
   reviewScore?: number;
   reviewUrl?: string;
-  tier: 'budget' | 'midrange' | 'premium';
+  tier: "budget" | "midrange" | "premium";
 }
 
 export interface CreateBuildRequest {
@@ -100,4 +100,28 @@ export interface HealthResponse {
   environment: string;
   version: string;
   database: string;
+}
+
+export interface InstructionStep {
+  stepNumber: number;
+  title: string;
+  description: string;
+  warnings?: string[];
+  tips?: string[];
+}
+
+export interface AssemblyInstructions {
+  title: string;
+  estimatedTime?: string;
+  overview?: string;
+  steps: InstructionStep[];
+  finalChecks?: string[];
+}
+
+export interface GetInstructionsResponse {
+  buildId: string;
+  instructions: AssemblyInstructions;
+  cached: boolean;
+  latencyMs: number;
+  requestId: string;
 }

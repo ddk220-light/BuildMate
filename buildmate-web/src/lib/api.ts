@@ -10,6 +10,7 @@ import type {
   GetBuildResponse,
   HealthResponse,
   ApiError,
+  GetInstructionsResponse,
 } from "../types/api";
 
 // Use relative URL in development (proxied by Vite), absolute URL in production
@@ -148,8 +149,10 @@ export const api = {
   /**
    * Get assembly instructions
    */
-  getInstructions: async (buildId: string): Promise<unknown> => {
-    return request(`/builds/${buildId}/instructions`);
+  getInstructions: async (
+    buildId: string,
+  ): Promise<GetInstructionsResponse> => {
+    return request<GetInstructionsResponse>(`/builds/${buildId}/instructions`);
   },
 
   /**

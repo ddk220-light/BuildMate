@@ -2,11 +2,11 @@
  * Build Completion Page
  */
 
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Spinner } from '../components/ui';
-import { api, ApiClientError } from '../lib/api';
-import type { Build, BuildItem } from '../types/api';
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button, Spinner, AssemblyGuide } from "../components/ui";
+import { api, ApiClientError } from "../lib/api";
+import type { Build, BuildItem, AssemblyInstructions } from "../types/api";
 
 export function CompletePage() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +16,13 @@ export function CompletePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  const [instructions, setInstructions] = useState<AssemblyInstructions | null>(
+    null,
+  );
+  const [isLoadingInstructions, setIsLoadingInstructions] = useState(false);
+  const [instructionsError, setInstructionsError] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -29,7 +36,7 @@ export function CompletePage() {
         if (err instanceof ApiClientError) {
           setError(err.message);
         } else {
-          setError('Failed to load build');
+          setError("Failed to load build");
         }
       } finally {
         setIsLoading(false);
@@ -44,15 +51,18 @@ export function CompletePage() {
 
     try {
       const savedBuilds = JSON.parse(
-        localStorage.getItem('buildmate_saved_builds') || '[]'
+        localStorage.getItem("buildmate_saved_builds") || "[]",
       );
 
       const buildToSave = {
         id: build.id,
         savedAt: new Date().toISOString(),
-        category: build.structure?.buildCategory || 'Unknown',
+        category: build.structure?.buildCategory || "Unknown",
         description: build.description,
-        totalCost: items.reduce((sum, item) => sum + (item.product_price || 0), 0),
+        totalCost: items.reduce(
+          (sum, item) => sum + (item.product_price || 0),
+          0,
+        ),
         items: items.map((item) => ({
           type: item.component_type,
           name: item.product_name,
@@ -62,7 +72,7 @@ export function CompletePage() {
 
       // Check if already saved
       const existingIndex = savedBuilds.findIndex(
-        (b: { id: string }) => b.id === build.id
+        (b: { id: string }) => b.id === build.id,
       );
       if (existingIndex >= 0) {
         savedBuilds[existingIndex] = buildToSave;
@@ -70,12 +80,15 @@ export function CompletePage() {
         savedBuilds.push(buildToSave);
       }
 
-      localStorage.setItem('buildmate_saved_builds', JSON.stringify(savedBuilds));
-      setSaveMessage('Build saved to browser storage!');
+      localStorage.setItem(
+        "buildmate_saved_builds",
+        JSON.stringify(savedBuilds),
+      );
+      setSaveMessage("Build saved to browser storage!");
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (err) {
-      console.error('Failed to save build:', err);
-      setSaveMessage('Failed to save build');
+      console.error("Failed to save build:", err);
+      setSaveMessage("Failed to save build");
     }
   };
 
@@ -85,20 +98,41 @@ export function CompletePage() {
     try {
       const exportData = await api.exportBuild(id);
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json',
+        type: "application/json",
       });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = `buildmate-${build?.structure?.buildCategory || 'build'}-${
-        new Date().toISOString().split('T')[0]
+      a.download = `buildmate-${build?.structure?.buildCategory || "build"}-${
+        new Date().toISOString().split("T")[0]
       }.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Failed to export build:', err);
+      console.error("Failed to export build:", err);
+    }
+  };
+
+  const handleGetInstructions = async () => {
+    if (!id) return;
+
+    setIsLoadingInstructions(true);
+    setInstructionsError(null);
+
+    try {
+      const response = await api.getInstructions(id);
+      setInstructions(response.instructions);
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        setInstructionsError(err.message);
+      } else {
+        setInstructionsError("Failed to generate assembly instructions");
+      }
+      console.error("Failed to get instructions:", err);
+    } finally {
+      setIsLoadingInstructions(false);
     }
   };
 
@@ -121,13 +155,16 @@ export function CompletePage() {
             Build Not Found
           </h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <Button onClick={() => navigate('/')}>Start New Build</Button>
+          <Button onClick={() => navigate("/")}>Start New Build</Button>
         </div>
       </div>
     );
   }
 
-  const totalCost = items.reduce((sum, item) => sum + (item.product_price || 0), 0);
+  const totalCost = items.reduce(
+    (sum, item) => sum + (item.product_price || 0),
+    0,
+  );
   const isUnderBudget = totalCost <= build.budget.max;
   const budgetDiff = Math.abs(build.budget.max - totalCost);
 
@@ -142,7 +179,7 @@ export function CompletePage() {
           Build Complete!
         </h1>
         <p className="text-gray-600">
-          {build.structure?.buildCategory || 'Your Build'}
+          {build.structure?.buildCategory || "Your Build"}
         </p>
       </div>
 
@@ -166,7 +203,7 @@ export function CompletePage() {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">
-                    {item.product_name || 'Not selected'}
+                    {item.product_name || "Not selected"}
                   </p>
                   <p className="text-sm text-gray-500">
                     {item.component_type}
@@ -176,7 +213,7 @@ export function CompletePage() {
               </div>
               <div className="text-right">
                 <p className="font-semibold text-gray-900">
-                  ${item.product_price?.toLocaleString() || '—'}
+                  ${item.product_price?.toLocaleString() || "—"}
                 </p>
                 {item.product_url && (
                   <a
@@ -208,11 +245,11 @@ export function CompletePage() {
             </span>
             <span
               className={`font-medium ${
-                isUnderBudget ? 'text-green-600' : 'text-red-600'
+                isUnderBudget ? "text-green-600" : "text-red-600"
               }`}
             >
-              {isUnderBudget ? '✓' : '⚠'} ${budgetDiff.toLocaleString()}{' '}
-              {isUnderBudget ? 'under' : 'over'} budget
+              {isUnderBudget ? "✓" : "⚠"} ${budgetDiff.toLocaleString()}{" "}
+              {isUnderBudget ? "under" : "over"} budget
             </span>
           </div>
         </div>
@@ -226,7 +263,7 @@ export function CompletePage() {
       )}
 
       {/* Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
         <h3 className="font-semibold text-gray-900 mb-4">Save Your Build</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Button variant="outline" onClick={handleSaveToLocal}>
@@ -235,21 +272,45 @@ export function CompletePage() {
           <Button variant="outline" onClick={handleDownloadJSON}>
             📥 Download JSON
           </Button>
-          <Button variant="outline" disabled>
-            📋 Get Assembly Guide
+          <Button
+            variant="outline"
+            onClick={handleGetInstructions}
+            disabled={isLoadingInstructions || !!instructions}
+          >
+            {isLoadingInstructions ? (
+              <>
+                <Spinner size="sm" className="inline mr-2" />
+                Generating...
+              </>
+            ) : instructions ? (
+              "✓ Guide Generated"
+            ) : (
+              "📋 Get Assembly Guide"
+            )}
           </Button>
         </div>
-        <p className="mt-3 text-sm text-gray-500 text-center">
-          Assembly guide feature coming soon in Epic 7
-        </p>
       </div>
+
+      {/* Instructions Error */}
+      {instructionsError && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {instructionsError}
+        </div>
+      )}
+
+      {/* Assembly Instructions */}
+      {instructions && (
+        <div className="mb-6">
+          <AssemblyGuide instructions={instructions} />
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="mt-8 flex gap-4 justify-center">
         <Button variant="outline" onClick={() => navigate(`/build/${id}`)}>
           ← Back to Build
         </Button>
-        <Button onClick={() => navigate('/')}>Start New Build</Button>
+        <Button onClick={() => navigate("/")}>Start New Build</Button>
       </div>
     </div>
   );

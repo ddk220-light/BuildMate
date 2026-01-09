@@ -2,34 +2,70 @@
  * Home Page - Build Input Form
  */
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Input, Textarea } from '../components/ui';
-import { api, ApiClientError } from '../lib/api';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Input, Textarea } from "../components/ui";
+import { api, ApiClientError } from "../lib/api";
+
+interface SavedBuild {
+  id: string;
+  savedAt: string;
+  category: string;
+  description: string;
+  totalCost: number;
+  items: Array<{ type: string; name: string; price: number }>;
+}
 
 const EXAMPLE_PROMPTS = [
-  'A gaming PC for 1440p gaming',
-  'Home theater system for my living room',
-  'Smart home starter kit',
-  'Budget workstation for video editing',
-  'Streaming setup for beginners',
+  "A gaming PC for 1440p gaming",
+  "Home theater system for my living room",
+  "Smart home starter kit",
+  "Budget workstation for video editing",
+  "Streaming setup for beginners",
 ];
 
 export function HomePage() {
   const navigate = useNavigate();
-  const [description, setDescription] = useState('');
-  const [budgetMin, setBudgetMin] = useState('500');
-  const [budgetMax, setBudgetMax] = useState('1500');
+  const [description, setDescription] = useState("");
+  const [budgetMin, setBudgetMin] = useState("500");
+  const [budgetMax, setBudgetMax] = useState("1500");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedBuilds, setSavedBuilds] = useState<SavedBuild[]>([]);
+
+  // Load saved builds from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem("buildmate_saved_builds") || "[]",
+      );
+      setSavedBuilds(saved);
+    } catch (err) {
+      console.error("Failed to load saved builds:", err);
+    }
+  }, []);
 
   const handleExampleClick = (example: string) => {
     setDescription(example);
   };
 
+  const handleDeleteBuild = (buildId: string) => {
+    const updated = savedBuilds.filter((b) => b.id !== buildId);
+    localStorage.setItem("buildmate_saved_builds", JSON.stringify(updated));
+    setSavedBuilds(updated);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
   const validateForm = (): boolean => {
     if (!description.trim()) {
-      setError('Please describe what you want to build');
+      setError("Please describe what you want to build");
       return false;
     }
 
@@ -37,17 +73,17 @@ export function HomePage() {
     const max = parseFloat(budgetMax);
 
     if (isNaN(min) || isNaN(max)) {
-      setError('Please enter valid budget amounts');
+      setError("Please enter valid budget amounts");
       return false;
     }
 
     if (min < 0 || max < 0) {
-      setError('Budget cannot be negative');
+      setError("Budget cannot be negative");
       return false;
     }
 
     if (min >= max) {
-      setError('Minimum budget must be less than maximum budget');
+      setError("Minimum budget must be less than maximum budget");
       return false;
     }
 
@@ -77,9 +113,9 @@ export function HomePage() {
       if (err instanceof ApiClientError) {
         setError(err.message);
       } else {
-        setError('Failed to create build. Please try again.');
+        setError("Failed to create build. Please try again.");
       }
-      console.error('Error creating build:', err);
+      console.error("Error creating build:", err);
     } finally {
       setIsLoading(false);
     }
@@ -223,6 +259,59 @@ export function HomePage() {
           </p>
         </div>
       </div>
+
+      {/* Saved Builds Section */}
+      {savedBuilds.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Your Saved Builds
+          </h2>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-200">
+            {savedBuilds.map((build) => (
+              <div
+                key={build.id}
+                className="p-4 flex items-center justify-between"
+              >
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-gray-900 truncate">
+                    {build.category}
+                  </h3>
+                  <p className="text-sm text-gray-500 truncate">
+                    {build.description}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4 ml-4">
+                  <div className="text-right">
+                    <p className="font-semibold text-gray-900">
+                      ${build.totalCost.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(build.savedAt)}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/build/${build.id}/complete`)}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteBuild(build.id)}
+                      className="text-red-600 hover:text-red-700 hover:border-red-300"
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

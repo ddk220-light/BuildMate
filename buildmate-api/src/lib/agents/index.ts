@@ -6,3 +6,4 @@
 
 export * from "./structure";
 export * from "./options";
+export * from "./instruction";

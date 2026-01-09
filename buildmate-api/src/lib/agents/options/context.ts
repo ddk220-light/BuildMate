@@ -4,8 +4,8 @@
  * Loads build state from database and formats it for the prompt.
  */
 
-import type { OptionGeneratorOutput } from '../../gemini/schemas';
-import type { OptionGeneratorContext } from './prompt';
+import type { OptionGeneratorOutput } from "../../gemini/schemas";
+import type { OptionGeneratorContext } from "./prompt";
 
 interface BuildRow {
   id: string;
@@ -40,52 +40,63 @@ interface StructureData {
 export async function buildContextFromDatabase(
   db: D1Database,
   buildId: string,
-  stepIndex: number
+  stepIndex: number,
 ): Promise<
-  { success: true; context: OptionGeneratorContext } | { success: false; error: string }
+  | { success: true; context: OptionGeneratorContext }
+  | { success: false; error: string }
 > {
   // 1. Fetch the build
   const build = await db
-    .prepare('SELECT * FROM builds WHERE id = ?')
+    .prepare("SELECT * FROM builds WHERE id = ?")
     .bind(buildId)
     .first<BuildRow>();
 
   if (!build) {
-    return { success: false, error: 'Build not found' };
+    return { success: false, error: "Build not found" };
   }
 
   // 2. Check if structure exists
   if (!build.structure_json) {
-    return { success: false, error: 'Build structure not initialized' };
+    return { success: false, error: "Build structure not initialized" };
   }
 
   const structure: StructureData = JSON.parse(build.structure_json);
 
   // 3. Validate step index
   if (stepIndex < 0 || stepIndex > 2) {
-    return { success: false, error: 'Invalid step index. Must be 0, 1, or 2' };
+    return { success: false, error: "Invalid step index. Must be 0, 1, or 2" };
   }
 
-  const currentComponent = structure.components.find((c) => c.stepIndex === stepIndex);
+  const currentComponent = structure.components.find(
+    (c) => c.stepIndex === stepIndex,
+  );
   if (!currentComponent) {
-    return { success: false, error: `Component for step ${stepIndex} not found in structure` };
+    return {
+      success: false,
+      error: `Component for step ${stepIndex} not found in structure`,
+    };
   }
 
   // 4. Fetch previously selected items (steps < current step)
   const items = await db
     .prepare(
-      'SELECT step_index, component_type, product_name, product_brand, product_price FROM build_items WHERE build_id = ? AND step_index < ? AND product_name IS NOT NULL ORDER BY step_index'
+      "SELECT step_index, component_type, product_name, product_brand, product_price FROM build_items WHERE build_id = ? AND step_index < ? AND product_name IS NOT NULL ORDER BY step_index",
     )
     .bind(buildId, stepIndex)
     .all<BuildItemRow>();
 
   // 5. Calculate remaining budget
-  const amountSpent = items.results.reduce((sum, item) => sum + (item.product_price || 0), 0);
+  const amountSpent = items.results.reduce(
+    (sum, item) => sum + (item.product_price || 0),
+    0,
+  );
   const remainingBudget = build.budget_max - amountSpent;
 
   // 6. Calculate suggested allocation for this component
-  const budgetAllocationPercent = currentComponent.budgetAllocationPercent || 33;
-  const suggestedAllocation = (build.budget_max * budgetAllocationPercent) / 100;
+  const budgetAllocationPercent =
+    currentComponent.budgetAllocationPercent || 33;
+  const suggestedAllocation =
+    (build.budget_max * budgetAllocationPercent) / 100;
 
   // 7. Build the context
   const context: OptionGeneratorContext = {
@@ -106,7 +117,7 @@ export async function buildContextFromDatabase(
       .map((item) => ({
         componentType: item.component_type,
         productName: item.product_name!,
-        brand: item.product_brand || 'Unknown',
+        brand: item.product_brand || "Unknown",
         price: item.product_price || 0,
       })),
   };
@@ -121,19 +132,25 @@ export async function buildContextFromDatabase(
 export async function getCachedOptions(
   db: D1Database,
   buildId: string,
-  stepIndex: number
+  stepIndex: number,
 ): Promise<OptionGeneratorOutput | null> {
-  const cached = await db
-    .prepare(
-      'SELECT options_json FROM build_options_shown WHERE build_id = ? AND step_index = ? ORDER BY shown_at DESC LIMIT 1'
-    )
-    .bind(buildId, stepIndex)
-    .first<{ options_json: string }>();
+  try {
+    const cached = await db
+      .prepare(
+        "SELECT options_json FROM build_options_shown WHERE build_id = ? AND step_index = ? ORDER BY shown_at DESC LIMIT 1",
+      )
+      .bind(buildId, stepIndex)
+      .first<{ options_json: string }>();
 
-  if (cached) {
-    return JSON.parse(cached.options_json);
+    if (cached) {
+      return JSON.parse(cached.options_json);
+    }
+    return null;
+  } catch (error) {
+    // Log but don't fail if cache retrieval fails
+    console.warn("Failed to retrieve cached options:", error);
+    return null;
   }
-  return null;
 }
 
 /**
@@ -143,13 +160,18 @@ export async function saveShownOptions(
   db: D1Database,
   buildId: string,
   stepIndex: number,
-  options: OptionGeneratorOutput
+  options: OptionGeneratorOutput,
 ): Promise<void> {
-  const id = crypto.randomUUID();
-  await db
-    .prepare(
-      'INSERT INTO build_options_shown (id, build_id, step_index, options_json) VALUES (?, ?, ?, ?)'
-    )
-    .bind(id, buildId, stepIndex, JSON.stringify(options))
-    .run();
+  try {
+    const id = crypto.randomUUID();
+    await db
+      .prepare(
+        "INSERT INTO build_options_shown (id, build_id, step_index, options_json) VALUES (?, ?, ?, ?)",
+      )
+      .bind(id, buildId, stepIndex, JSON.stringify(options))
+      .run();
+  } catch (error) {
+    // Log but don't fail the request if caching fails
+    console.warn("Failed to save shown options for analytics:", error);
+  }
 }
