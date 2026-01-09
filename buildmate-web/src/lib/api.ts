@@ -105,8 +105,10 @@ export const api = {
   getStepOptions: async (
     buildId: string,
     stepIndex: number,
+    refresh = false,
   ): Promise<unknown> => {
-    return request(`/builds/${buildId}/step/${stepIndex}/options`);
+    const queryParam = refresh ? "?refresh=true" : "";
+    return request(`/builds/${buildId}/step/${stepIndex}/options${queryParam}`);
   },
 
   /**
@@ -115,11 +117,22 @@ export const api = {
   selectOption: async (
     buildId: string,
     stepIndex: number,
-    optionIndex: number,
+    productData: {
+      productName: string;
+      brand: string;
+      price: number;
+      keySpec: string;
+      compatibilityNote: string;
+      tier: "budget" | "midrange" | "premium";
+      productUrl?: string;
+      imageUrl?: string;
+      reviewScore?: number;
+      reviewUrl?: string;
+    },
   ): Promise<unknown> => {
     return request(`/builds/${buildId}/step/${stepIndex}/select`, {
       method: "POST",
-      body: JSON.stringify({ optionIndex }),
+      body: JSON.stringify(productData),
     });
   },
 
