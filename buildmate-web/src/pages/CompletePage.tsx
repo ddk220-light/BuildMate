@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button, Spinner, AssemblyGuide } from "../components/ui";
+import { Button, Spinner, Icon, AssemblyGuide } from "../components/ui";
 import { api, ApiClientError } from "../lib/api";
 import type { Build, BuildItem, AssemblyInstructions } from "../types/api";
 
@@ -173,10 +173,15 @@ export function CompletePage() {
       {/* Success Header */}
       <div className="text-center mb-8">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-4xl">🎉</span>
+          <Icon
+            name="celebration"
+            size="xl"
+            className="text-green-600"
+            aria-hidden
+          />
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Build Complete!
+          Build Complete
         </h1>
         <p className="text-gray-600">
           {build.structure?.buildCategory || "Your Build"}
@@ -222,7 +227,7 @@ export function CompletePage() {
                     rel="noopener noreferrer"
                     className="text-sm text-blue-500 hover:text-blue-600"
                   >
-                    View Product →
+                    View Product
                   </a>
                 )}
               </div>
@@ -244,12 +249,17 @@ export function CompletePage() {
               {build.budget.max.toLocaleString()}
             </span>
             <span
-              className={`font-medium ${
+              className={`font-medium inline-flex items-center gap-1 ${
                 isUnderBudget ? "text-green-600" : "text-red-600"
               }`}
             >
-              {isUnderBudget ? "✓" : "⚠"} ${budgetDiff.toLocaleString()}{" "}
-              {isUnderBudget ? "under" : "over"} budget
+              <Icon
+                name={isUnderBudget ? "check" : "warning"}
+                size="sm"
+                aria-hidden
+              />
+              ${budgetDiff.toLocaleString()} {isUnderBudget ? "under" : "over"}{" "}
+              budget
             </span>
           </div>
         </div>
@@ -267,10 +277,12 @@ export function CompletePage() {
         <h3 className="font-semibold text-gray-900 mb-4">Save Your Build</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Button variant="outline" onClick={handleSaveToLocal}>
-            💾 Save to Browser
+            <Icon name="save" size="sm" className="mr-2" aria-hidden />
+            Save to Browser
           </Button>
           <Button variant="outline" onClick={handleDownloadJSON}>
-            📥 Download JSON
+            <Icon name="download" size="sm" className="mr-2" aria-hidden />
+            Download JSON
           </Button>
           <Button
             variant="outline"
@@ -283,9 +295,15 @@ export function CompletePage() {
                 Generating...
               </>
             ) : instructions ? (
-              "✓ Guide Generated"
+              <>
+                <Icon name="check" size="sm" className="mr-2" aria-hidden />
+                Guide Ready
+              </>
             ) : (
-              "📋 Get Assembly Guide"
+              <>
+                <Icon name="clipboard" size="sm" className="mr-2" aria-hidden />
+                Get Assembly Guide
+              </>
             )}
           </Button>
         </div>
@@ -308,7 +326,7 @@ export function CompletePage() {
       {/* Navigation */}
       <div className="mt-8 flex gap-4 justify-center">
         <Button variant="outline" onClick={() => navigate(`/build/${id}`)}>
-          ← Back to Build
+          Back to Build
         </Button>
         <Button onClick={() => navigate("/")}>Start New Build</Button>
       </div>

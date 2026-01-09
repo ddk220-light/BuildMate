@@ -4,6 +4,8 @@
  * Displays budget information with progress bar and visual indicators
  */
 
+import { Icon } from "./Icon";
+
 interface BudgetTrackerProps {
   budgetMin: number;
   budgetMax: number;
@@ -11,14 +13,21 @@ interface BudgetTrackerProps {
   remaining: number;
 }
 
-export function BudgetTracker({ budgetMin, budgetMax, spent, remaining }: BudgetTrackerProps) {
+export function BudgetTracker({
+  budgetMin,
+  budgetMax,
+  spent,
+  remaining,
+}: BudgetTrackerProps) {
   const percentSpent = (spent / budgetMax) * 100;
   const isOverBudget = spent > budgetMax;
   const isUnderMinimum = spent < budgetMin;
 
   return (
     <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-      <h3 className="text-sm font-semibold text-gray-700 mb-3">Budget Tracker</h3>
+      <h3 className="text-sm font-semibold text-gray-700 mb-3">
+        Budget Tracker
+      </h3>
 
       <div className="space-y-3">
         {/* Budget Range */}
@@ -42,11 +51,11 @@ export function BudgetTracker({ budgetMin, budgetMax, spent, remaining }: Budget
           <span className="text-gray-600">Remaining:</span>
           <span
             className={`font-semibold ${
-              isOverBudget ? 'text-red-600' : 'text-green-600'
+              isOverBudget ? "text-red-600" : "text-green-600"
             }`}
           >
             ${Math.abs(remaining).toLocaleString()}
-            {isOverBudget && ' over budget'}
+            {isOverBudget && " over budget"}
           </span>
         </div>
 
@@ -56,10 +65,10 @@ export function BudgetTracker({ budgetMin, budgetMax, spent, remaining }: Budget
             <div
               className={`h-full transition-all duration-300 ${
                 isOverBudget
-                  ? 'bg-red-500'
+                  ? "bg-red-500"
                   : isUnderMinimum
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
+                    ? "bg-yellow-500"
+                    : "bg-green-500"
               }`}
               style={{ width: `${Math.min(percentSpent, 100)}%` }}
             />
@@ -75,13 +84,26 @@ export function BudgetTracker({ budgetMin, budgetMax, spent, remaining }: Budget
 
         {/* Warnings */}
         {isOverBudget && (
-          <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1">
-            ⚠️ You're over budget! Consider adjusting your selections.
+          <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1.5 flex items-center gap-1.5">
+            <Icon
+              name="warning"
+              size="sm"
+              className="flex-shrink-0"
+              aria-hidden
+            />
+            <span>
+              <strong>Warning:</strong> You're over budget. Consider adjusting
+              your selections.
+            </span>
           </div>
         )}
         {isUnderMinimum && !isOverBudget && (
-          <div className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded px-2 py-1">
-            ℹ️ You're under your minimum budget. You have room for upgrades!
+          <div className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded px-2 py-1.5 flex items-center gap-1.5">
+            <Icon name="info" size="sm" className="flex-shrink-0" aria-hidden />
+            <span>
+              <strong>Note:</strong> You're under your minimum budget. You have
+              room for upgrades.
+            </span>
           </div>
         )}
       </div>

@@ -4,8 +4,9 @@
  * Displays a product option with details and selection button
  */
 
-import { Button } from './Button';
-import { Badge } from './Badge';
+import { Button } from "./Button";
+import { Badge } from "./Badge";
+import { Icon } from "./Icon";
 
 export interface ProductOption {
   productName: string;
@@ -16,7 +17,7 @@ export interface ProductOption {
   reviewScore?: number;
   productUrl?: string;
   reviewUrl?: string;
-  tier: 'budget' | 'midrange' | 'premium';
+  tier: "budget" | "midrange" | "premium";
 }
 
 interface ProductCardProps {
@@ -27,23 +28,31 @@ interface ProductCardProps {
 }
 
 const tierConfig = {
-  budget: { variant: 'success' as const, label: 'Budget' },
-  midrange: { variant: 'primary' as const, label: 'Midrange' },
-  premium: { variant: 'secondary' as const, label: 'Premium' },
+  budget: { variant: "success" as const, label: "Budget" },
+  midrange: { variant: "primary" as const, label: "Midrange" },
+  premium: { variant: "secondary" as const, label: "Premium" },
 };
 
-export function ProductCard({ product, onSelect, isSelected = false, isLoading = false }: ProductCardProps) {
+export function ProductCard({
+  product,
+  onSelect,
+  isSelected = false,
+  isLoading = false,
+}: ProductCardProps) {
   const tierInfo = tierConfig[product.tier];
 
   return (
     <div
       className={`
         bg-white rounded-lg border-2 p-5 transition-all duration-200
-        ${isSelected
-          ? 'border-blue-500 ring-2 ring-blue-100 shadow-lg'
-          : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+        ${
+          isSelected
+            ? "border-blue-500 ring-2 ring-blue-100 shadow-lg"
+            : "border-gray-200 hover:border-gray-300 hover:shadow-md"
         }
-      `.trim().replace(/\s+/g, ' ')}
+      `
+        .trim()
+        .replace(/\s+/g, " ")}
     >
       {/* Header with Badge */}
       <div className="flex items-start justify-between mb-3">
@@ -67,15 +76,14 @@ export function ProductCard({ product, onSelect, isSelected = false, isLoading =
 
       {/* Key Specs */}
       <div className="mb-3">
-        <p className="text-sm text-gray-700 line-clamp-2">
-          {product.keySpec}
-        </p>
+        <p className="text-sm text-gray-700 line-clamp-2">{product.keySpec}</p>
       </div>
 
       {/* Compatibility Note */}
       <div className="mb-4">
-        <p className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded px-2 py-1.5">
-          ✓ {product.compatibilityNote}
+        <p className="text-xs text-blue-600 bg-blue-50 border border-blue-100 rounded px-2 py-1.5 flex items-center gap-1">
+          <Icon name="check" size="xs" className="flex-shrink-0" aria-hidden />
+          {product.compatibilityNote}
         </p>
       </div>
 
@@ -83,7 +91,12 @@ export function ProductCard({ product, onSelect, isSelected = false, isLoading =
       {product.reviewScore !== undefined && product.reviewScore > 0 && (
         <div className="flex items-center gap-2 mb-4">
           <div className="flex items-center">
-            <span className="text-yellow-500">★</span>
+            <Icon
+              name="star-filled"
+              size="sm"
+              className="text-yellow-500"
+              aria-hidden
+            />
             <span className="text-sm font-semibold text-gray-900 ml-1">
               {product.reviewScore.toFixed(1)}
             </span>
@@ -106,11 +119,18 @@ export function ProductCard({ product, onSelect, isSelected = false, isLoading =
         <Button
           onClick={onSelect}
           isLoading={isLoading}
-          variant={isSelected ? 'secondary' : 'primary'}
+          variant={isSelected ? "secondary" : "primary"}
           size="md"
           className="flex-1"
         >
-          {isSelected ? 'Selected ✓' : 'Select This'}
+          {isSelected ? (
+            <>
+              <Icon name="check" size="sm" className="mr-1" aria-hidden />
+              Selected
+            </>
+          ) : (
+            "Select This"
+          )}
         </Button>
         {product.productUrl && (
           <a
@@ -120,8 +140,18 @@ export function ProductCard({ product, onSelect, isSelected = false, isLoading =
             className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             title="View product details"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
             </svg>
           </a>
         )}

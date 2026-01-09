@@ -4,7 +4,14 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Textarea } from "../components/ui";
+import {
+  Button,
+  Input,
+  Textarea,
+  Icon,
+  OnboardingTour,
+  useTour,
+} from "../components/ui";
 import { api, ApiClientError } from "../lib/api";
 
 interface SavedBuild {
@@ -32,6 +39,7 @@ export function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedBuilds, setSavedBuilds] = useState<SavedBuild[]>([]);
+  const { showTour, completeTour } = useTour();
 
   // Load saved builds from localStorage on mount
   useEffect(() => {
@@ -138,7 +146,7 @@ export function HomePage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           {/* Description Input */}
-          <div className="mb-6">
+          <div className="mb-6" data-tour="description">
             <label className="block text-lg font-medium text-gray-900 mb-2">
               What would you like to build?
             </label>
@@ -153,7 +161,7 @@ export function HomePage() {
 
           {/* Example Prompts */}
           <div className="mb-6">
-            <p className="text-sm text-gray-500 mb-2">Try an example:</p>
+            <p className="text-sm text-gray-500 mb-2">Popular examples:</p>
             <div className="flex flex-wrap gap-2">
               {EXAMPLE_PROMPTS.map((example) => (
                 <button
@@ -169,12 +177,15 @@ export function HomePage() {
           </div>
 
           {/* Budget Range */}
-          <div>
+          <div data-tour="budget">
             <label className="block text-lg font-medium text-gray-900 mb-2">
               Budget Range
             </label>
             <div className="flex items-center gap-4">
               <div className="flex-1">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Minimum
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                     $
@@ -183,15 +194,18 @@ export function HomePage() {
                     type="number"
                     value={budgetMin}
                     onChange={(e) => setBudgetMin(e.target.value)}
-                    placeholder="Min"
+                    placeholder="500"
                     min="0"
                     step="100"
                     className="pl-7"
                   />
                 </div>
               </div>
-              <span className="text-gray-400">to</span>
+              <span className="text-gray-400 mt-6">to</span>
               <div className="flex-1">
+                <label className="block text-sm text-gray-600 mb-1">
+                  Maximum
+                </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                     $
@@ -200,7 +214,7 @@ export function HomePage() {
                     type="number"
                     value={budgetMax}
                     onChange={(e) => setBudgetMax(e.target.value)}
-                    placeholder="Max"
+                    placeholder="1500"
                     min="0"
                     step="100"
                     className="pl-7"
@@ -225,7 +239,7 @@ export function HomePage() {
           isLoading={isLoading}
           className="w-full"
         >
-          Start Building →
+          Start Building
         </Button>
       </form>
 
@@ -233,7 +247,12 @@ export function HomePage() {
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6">
         <div className="text-center">
           <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">🎯</span>
+            <Icon
+              name="target"
+              size="lg"
+              className="text-blue-600"
+              aria-hidden
+            />
           </div>
           <h3 className="font-medium text-gray-900 mb-1">Smart Selection</h3>
           <p className="text-sm text-gray-500">
@@ -242,7 +261,12 @@ export function HomePage() {
         </div>
         <div className="text-center">
           <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">✓</span>
+            <Icon
+              name="check"
+              size="lg"
+              className="text-green-600"
+              aria-hidden
+            />
           </div>
           <h3 className="font-medium text-gray-900 mb-1">Compatible</h3>
           <p className="text-sm text-gray-500">
@@ -251,7 +275,12 @@ export function HomePage() {
         </div>
         <div className="text-center">
           <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">💰</span>
+            <Icon
+              name="dollar"
+              size="lg"
+              className="text-purple-600"
+              aria-hidden
+            />
           </div>
           <h3 className="font-medium text-gray-900 mb-1">Budget-Aware</h3>
           <p className="text-sm text-gray-500">
@@ -312,6 +341,9 @@ export function HomePage() {
           </div>
         </div>
       )}
+
+      {/* Onboarding Tour */}
+      {showTour && <OnboardingTour onComplete={completeTour} />}
     </div>
   );
 }

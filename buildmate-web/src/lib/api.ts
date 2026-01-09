@@ -11,6 +11,7 @@ import type {
   HealthResponse,
   ApiError,
   GetInstructionsResponse,
+  GetStepOptionsResponse,
 } from "../types/api";
 
 // Use relative URL in development (proxied by Vite), absolute URL in production
@@ -107,9 +108,11 @@ export const api = {
     buildId: string,
     stepIndex: number,
     refresh = false,
-  ): Promise<unknown> => {
+  ): Promise<GetStepOptionsResponse> => {
     const queryParam = refresh ? "?refresh=true" : "";
-    return request(`/builds/${buildId}/step/${stepIndex}/options${queryParam}`);
+    return request<GetStepOptionsResponse>(
+      `/builds/${buildId}/step/${stepIndex}/options${queryParam}`,
+    );
   },
 
   /**

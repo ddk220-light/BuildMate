@@ -125,3 +125,14 @@ export interface GetInstructionsResponse {
   latencyMs: number;
   requestId: string;
 }
+
+export interface GetStepOptionsResponse {
+  buildId: string;
+  stepIndex: number;
+  componentType: string;
+  remainingBudget: number;
+  options: ProductOption[];
+  cached: boolean;
+  latencyMs: number;
+  requestId: string;
+}

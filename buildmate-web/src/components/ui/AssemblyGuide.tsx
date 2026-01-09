@@ -5,8 +5,9 @@
  * Supports collapsible steps and print-friendly styling.
  */
 
-import { useState } from 'react';
-import type { AssemblyInstructions } from '../../types/api';
+import { useState } from "react";
+import type { AssemblyInstructions } from "../../types/api";
+import { Icon } from "./Icon";
 
 interface AssemblyGuideProps {
   instructions: AssemblyInstructions;
@@ -14,7 +15,7 @@ interface AssemblyGuideProps {
 
 export function AssemblyGuide({ instructions }: AssemblyGuideProps) {
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(
-    new Set(instructions.steps.map((step) => step.stepNumber))
+    new Set(instructions.steps.map((step) => step.stepNumber)),
   );
 
   const toggleStep = (stepNumber: number) => {
@@ -28,7 +29,9 @@ export function AssemblyGuide({ instructions }: AssemblyGuideProps) {
   };
 
   const expandAll = () => {
-    setExpandedSteps(new Set(instructions.steps.map((step) => step.stepNumber)));
+    setExpandedSteps(
+      new Set(instructions.steps.map((step) => step.stepNumber)),
+    );
   };
 
   const collapseAll = () => {
@@ -76,9 +79,10 @@ export function AssemblyGuide({ instructions }: AssemblyGuideProps) {
         </button>
         <button
           onClick={handlePrint}
-          className="text-sm px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition ml-auto"
+          className="text-sm px-3 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition ml-auto inline-flex items-center gap-1.5"
         >
-          🖨️ Print Guide
+          <Icon name="print" size="sm" aria-hidden />
+          Print Guide
         </button>
       </div>
 
@@ -103,7 +107,11 @@ export function AssemblyGuide({ instructions }: AssemblyGuideProps) {
                   <h3 className="font-semibold text-gray-900">{step.title}</h3>
                 </div>
                 <span className="text-gray-500 print:hidden">
-                  {isExpanded ? '▼' : '▶'}
+                  <Icon
+                    name={isExpanded ? "chevron-down" : "chevron-right"}
+                    size="sm"
+                    aria-hidden
+                  />
                 </span>
               </button>
 
@@ -119,7 +127,12 @@ export function AssemblyGuide({ instructions }: AssemblyGuideProps) {
                   {step.warnings && step.warnings.length > 0 && (
                     <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
                       <div className="flex items-start gap-2">
-                        <span className="text-yellow-600 text-lg">⚠️</span>
+                        <Icon
+                          name="warning"
+                          size="md"
+                          className="text-yellow-600 flex-shrink-0 mt-0.5"
+                          aria-hidden
+                        />
                         <div className="flex-1">
                           <h4 className="font-semibold text-yellow-800 mb-2">
                             Warning
@@ -141,7 +154,12 @@ export function AssemblyGuide({ instructions }: AssemblyGuideProps) {
                   {step.tips && step.tips.length > 0 && (
                     <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
                       <div className="flex items-start gap-2">
-                        <span className="text-blue-600 text-lg">💡</span>
+                        <Icon
+                          name="lightbulb"
+                          size="md"
+                          className="text-blue-600 flex-shrink-0 mt-0.5"
+                          aria-hidden
+                        />
                         <div className="flex-1">
                           <h4 className="font-semibold text-blue-800 mb-2">
                             Tips
@@ -169,7 +187,12 @@ export function AssemblyGuide({ instructions }: AssemblyGuideProps) {
       {instructions.finalChecks && instructions.finalChecks.length > 0 && (
         <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4 print:break-inside-avoid">
           <h3 className="font-semibold text-green-900 mb-3 flex items-center gap-2">
-            <span>✓</span>
+            <Icon
+              name="check-circle"
+              size="md"
+              className="text-green-600"
+              aria-hidden
+            />
             Final Checks
           </h3>
           <ul className="space-y-2">

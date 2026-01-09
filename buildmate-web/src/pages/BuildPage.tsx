@@ -8,6 +8,7 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Button,
   Spinner,
+  Icon,
   BudgetTracker,
   ProductCard,
   ProgressStepper,
@@ -52,14 +53,14 @@ function BuildStructureInitializer({
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
       <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <span className="text-3xl">🔧</span>
+        <Icon name="wrench" size="xl" className="text-blue-600" aria-hidden />
       </div>
       <h2 className="text-xl font-semibold text-gray-900 mb-2">
         Ready to Build
       </h2>
       <p className="text-gray-600 mb-6">
-        Click the button below to have AI analyze your requirements and
-        determine the components you{"'"}ll need.
+        Our AI will analyze your requirements and determine the components you
+        need for your build.
       </p>
 
       {error && (
@@ -69,7 +70,7 @@ function BuildStructureInitializer({
       )}
 
       <Button size="lg" isLoading={isLoading} onClick={handleGenerateStructure}>
-        Generate Build Structure →
+        Generate Build Structure
       </Button>
     </div>
   );
@@ -119,8 +120,10 @@ export function BuildPage() {
   }, [id]);
 
   // Fetch options for current step
+  const buildStructure = build?.structure;
+  const buildStatus = build?.status;
   useEffect(() => {
-    if (!build || !build.structure || build.status !== "in_progress") return;
+    if (!buildStructure || buildStatus !== "in_progress") return;
     if (currentStep < 0 || currentStep > 2) return;
 
     const fetchOptions = async () => {
@@ -128,11 +131,7 @@ export function BuildPage() {
       setOptionsError(null);
 
       try {
-        const response = (await api.getStepOptions(
-          id!,
-          currentStep,
-          false,
-        )) as any;
+        const response = await api.getStepOptions(id!, currentStep, false);
         setStepOptions(response.options || []);
       } catch (err) {
         if (err instanceof ApiClientError) {
@@ -147,7 +146,7 @@ export function BuildPage() {
     };
 
     fetchOptions();
-  }, [id, currentStep, build?.structure, build?.status]);
+  }, [id, currentStep, buildStructure, buildStatus]);
 
   // Handle product selection
   const handleSelectOption = async (product: ProductOption) => {
@@ -206,7 +205,7 @@ export function BuildPage() {
     setOptionsError(null);
 
     try {
-      const response = (await api.getStepOptions(id, currentStep, true)) as any;
+      const response = await api.getStepOptions(id, currentStep, true);
       setStepOptions(response.options || []);
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -323,7 +322,7 @@ export function BuildPage() {
             instructions.
           </p>
           <Button onClick={() => navigate(`/build/${id}/complete`)}>
-            View Complete Build →
+            View Complete Build
           </Button>
         </div>
       </div>
@@ -403,7 +402,8 @@ export function BuildPage() {
                 onClick={handleRefreshOptions}
                 disabled={isLoadingOptions || isSubmitting}
               >
-                🔄 Get New Recommendations
+                <Icon name="refresh" size="sm" className="mr-2" aria-hidden />
+                Refresh Options
               </Button>
             </div>
           </>
@@ -420,7 +420,7 @@ export function BuildPage() {
       {/* Quick Actions */}
       <div className="text-center pt-4">
         <Button variant="outline" size="sm" onClick={() => navigate("/")}>
-          ← Start Over
+          Start Over
         </Button>
       </div>
     </div>

@@ -31,7 +31,7 @@ const PROD_ORIGINS = [
  * CORS configuration options shared between environments
  */
 const CORS_OPTIONS = {
-  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"] as const,
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"] as string[],
   allowHeaders: ["Content-Type", "Authorization", "X-Request-ID"],
   exposeHeaders: ["X-Request-ID"],
   maxAge: 86400, // 24 hours

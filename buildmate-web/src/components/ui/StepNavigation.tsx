@@ -4,7 +4,8 @@
  * Navigation buttons for wizard flow (Back/Next)
  */
 
-import { Button } from './Button';
+import { Button } from "./Button";
+import { Icon } from "./Icon";
 
 interface StepNavigationProps {
   onBack?: () => void;
@@ -17,7 +18,7 @@ export function StepNavigation({
   onBack,
   canGoBack = false,
   isLoading = false,
-  backLabel = '← Back'
+  backLabel = "Back",
 }: StepNavigationProps) {
   return (
     <div className="flex justify-between items-center pt-6 border-t border-gray-200">
@@ -29,6 +30,7 @@ export function StepNavigation({
           disabled={isLoading}
           size="md"
         >
+          <Icon name="arrow-left" size="sm" className="mr-1" aria-hidden />
           {backLabel}
         </Button>
       ) : (
@@ -37,7 +39,7 @@ export function StepNavigation({
 
       {/* Helper text */}
       <p className="text-sm text-gray-500 italic">
-        {isLoading ? 'Processing...' : 'Select a product to continue'}
+        {isLoading ? "Processing..." : "Select a product to continue"}
       </p>
     </div>
   );
