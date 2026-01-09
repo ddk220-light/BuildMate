@@ -17,6 +17,19 @@ import {
   buildInstructionContext,
   getCachedInstructions,
 } from "../lib/agents";
+import {
+  logBuildStarted,
+  logStructureGenerated,
+  logOptionsShown,
+  logOptionSelected,
+  logBuildCompleted,
+  logInstructionsGenerated,
+  calculateAndSaveMetrics,
+  getOverallStats,
+  getBudgetAdherenceStats,
+  getCompletionsByDay,
+  getBuildEvents,
+} from "../lib/events";
 
 // Create router with typed bindings
 const routes = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -104,6 +117,14 @@ routes.post("/builds", async (c) => {
         body.budgetMax,
       )
       .run();
+
+    // Log BUILD_STARTED event (fire-and-forget)
+    logBuildStarted(env.DB, buildId, {
+      description: body.description.trim(),
+      budgetMin: body.budgetMin,
+      budgetMax: body.budgetMax,
+      sessionId,
+    });
 
     return c.json(
       {
@@ -298,7 +319,17 @@ routes.post("/builds/:id/init", async (c) => {
         .run();
     }
 
-    // 6. Return the structure
+    // 6. Log STRUCTURE_GENERATED event (fire-and-forget)
+    logStructureGenerated(env.DB, buildId, {
+      buildCategory: result.data!.buildCategory,
+      components: result.data!.components.map((c) => ({
+        componentType: c.componentType,
+        stepIndex: c.stepIndex,
+      })),
+      latencyMs: result.latencyMs,
+    });
+
+    // 7. Return the structure
     return c.json({
       buildId,
       structure: result.data,
@@ -353,6 +384,13 @@ routes.get("/builds/:id/step/:n/options", async (c) => {
     if (!forceRefresh) {
       const cached = await getCachedOptions(env.DB, buildId, stepIndex);
       if (cached) {
+        // Log OPTIONS_SHOWN event for cached response (fire-and-forget)
+        logOptionsShown(env.DB, buildId, stepIndex, {
+          componentType: "cached",
+          optionCount: cached.options.length,
+          cached: true,
+        });
+
         return c.json({
           buildId,
           stepIndex,
@@ -411,6 +449,14 @@ routes.get("/builds/:id/step/:n/options", async (c) => {
 
     // Save shown options for analytics and caching
     await saveShownOptions(env.DB, buildId, stepIndex, result.data!);
+
+    // Log OPTIONS_SHOWN event (fire-and-forget)
+    logOptionsShown(env.DB, buildId, stepIndex, {
+      componentType: contextResult.context.componentType,
+      optionCount: result.data!.options.length,
+      cached: false,
+      latencyMs: result.latencyMs,
+    });
 
     return c.json({
       buildId,
@@ -527,6 +573,16 @@ routes.post("/builds/:id/step/:n/select", async (c) => {
       );
     }
 
+    // Check if this is a modification (item already selected)
+    const existingItem = await env.DB.prepare(
+      "SELECT component_type, selected_at FROM build_items WHERE build_id = ? AND step_index = ?",
+    )
+      .bind(buildId, stepIndex)
+      .first<{ component_type: string; selected_at: string | null }>();
+
+    const isModification = existingItem?.selected_at !== null;
+    const componentType = existingItem?.component_type || "unknown";
+
     // Update the build item with selected product
     await env.DB.prepare(
       `UPDATE build_items
@@ -553,6 +609,16 @@ routes.post("/builds/:id/step/:n/select", async (c) => {
         stepIndex,
       )
       .run();
+
+    // Log OPTION_SELECTED event (fire-and-forget)
+    logOptionSelected(env.DB, buildId, stepIndex, {
+      componentType,
+      productName: body.productName,
+      brand: body.brand,
+      price: body.price,
+      tier: body.tier,
+      isModification,
+    });
 
     // Update current_step in builds table
     // Use Math.max to prevent step regression when modifying previous selections
@@ -675,7 +741,23 @@ routes.post("/builds/:id/complete", async (c) => {
       0,
     );
 
-    // 5. Return confirmation
+    // 5. Calculate time to complete and log BUILD_COMPLETED event
+    const buildCreatedAt = new Date(build.created_at as string);
+    const completedAtDate = new Date();
+    const timeToCompleteMs =
+      completedAtDate.getTime() - buildCreatedAt.getTime();
+
+    // Log BUILD_COMPLETED event (fire-and-forget)
+    logBuildCompleted(env.DB, buildId, {
+      totalCost,
+      itemCount: items.results.length,
+      timeToCompleteMs,
+    });
+
+    // Calculate and save metrics (fire-and-forget)
+    calculateAndSaveMetrics(env.DB, buildId, completedAtDate);
+
+    // 6. Return confirmation
     return c.json({
       buildId,
       status: "completed",
@@ -715,6 +797,13 @@ routes.get("/builds/:id/instructions", async (c) => {
     // 1. Check for cached instructions first
     const cached = await getCachedInstructions(env.DB, buildId);
     if (cached) {
+      // Log INSTRUCTIONS_GENERATED event for cached (fire-and-forget)
+      logInstructionsGenerated(env.DB, buildId, {
+        cached: true,
+        latencyMs: 0,
+        stepCount: cached.steps?.length || 0,
+      });
+
       return c.json({
         buildId,
         instructions: cached,
@@ -767,7 +856,14 @@ routes.get("/builds/:id/instructions", async (c) => {
       );
     }
 
-    // 4. Return the generated instructions
+    // 4. Log INSTRUCTIONS_GENERATED event (fire-and-forget)
+    logInstructionsGenerated(env.DB, buildId, {
+      cached: false,
+      latencyMs: result.latencyMs,
+      stepCount: result.data!.steps?.length || 0,
+    });
+
+    // 5. Return the generated instructions
     return c.json({
       buildId,
       instructions: result.data,
@@ -869,6 +965,112 @@ routes.get("/builds/:id/export", async (c) => {
         error: {
           code: "DATABASE_ERROR",
           message: "Failed to export build",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
+  }
+});
+
+/**
+ * Get Build Events
+ * GET /api/builds/:id/events
+ *
+ * Returns all events for a specific build (for debugging/analytics)
+ */
+routes.get("/builds/:id/events", async (c) => {
+  const env = c.env;
+  const buildId = c.req.param("id");
+
+  try {
+    const events = await getBuildEvents(env.DB, buildId);
+
+    return c.json({
+      buildId,
+      events,
+      count: events.length,
+      requestId: c.get("requestId"),
+    });
+  } catch (error) {
+    console.error("Error fetching build events:", error);
+    return c.json(
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to fetch build events",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
+  }
+});
+
+/**
+ * Get Analytics Overview
+ * GET /api/analytics/overview
+ *
+ * Returns overall build statistics and budget adherence
+ */
+routes.get("/analytics/overview", async (c) => {
+  const env = c.env;
+
+  try {
+    const [overall, budgetAdherence] = await Promise.all([
+      getOverallStats(env.DB),
+      getBudgetAdherenceStats(env.DB),
+    ]);
+
+    return c.json({
+      overall,
+      budgetAdherence,
+      requestId: c.get("requestId"),
+    });
+  } catch (error) {
+    console.error("Error fetching analytics:", error);
+    return c.json(
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to fetch analytics",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
+  }
+});
+
+/**
+ * Get Daily Completion Stats
+ * GET /api/analytics/completions
+ *
+ * Returns completion stats by day for the last N days
+ */
+routes.get("/analytics/completions", async (c) => {
+  const env = c.env;
+  const days = parseInt(c.req.query("days") || "30", 10);
+
+  try {
+    const stats = await getCompletionsByDay(env.DB, days);
+
+    return c.json({
+      days,
+      stats,
+      count: stats.length,
+      requestId: c.get("requestId"),
+    });
+  } catch (error) {
+    console.error("Error fetching completion stats:", error);
+    return c.json(
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to fetch completion stats",
         },
         requestId: c.get("requestId"),
         timestamp: new Date().toISOString(),
