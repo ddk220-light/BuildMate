@@ -7,7 +7,13 @@
 import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
 import type { Env, Variables } from "../types/env";
-import { StructureGenerator } from "../lib/agents";
+import {
+  StructureGenerator,
+  OptionGenerator,
+  buildContextFromDatabase,
+  getCachedOptions,
+  saveShownOptions,
+} from "../lib/agents";
 
 // Create router with typed bindings
 const routes = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -319,20 +325,114 @@ routes.post("/builds/:id/init", async (c) => {
  * Returns 3 product options for the specified step
  */
 routes.get("/builds/:id/step/:n/options", async (c) => {
+  const env = c.env;
   const buildId = c.req.param("id");
   const stepIndex = parseInt(c.req.param("n"), 10);
 
-  // TODO: Implement Option Generator agent call
-  // For now, return a stub response
-  return c.json(
-    {
-      message: "Option generation not yet implemented",
+  // Validate step index
+  if (isNaN(stepIndex) || stepIndex < 0 || stepIndex > 2) {
+    return c.json(
+      {
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Step index must be 0, 1, or 2",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      400,
+    );
+  }
+
+  try {
+    // Check for cached options first (same session)
+    const forceRefresh = c.req.query("refresh") === "true";
+    if (!forceRefresh) {
+      const cached = await getCachedOptions(env.DB, buildId, stepIndex);
+      if (cached) {
+        return c.json({
+          buildId,
+          stepIndex,
+          options: cached.options,
+          cached: true,
+          requestId: c.get("requestId"),
+        });
+      }
+    }
+
+    // Build context from database
+    const contextResult = await buildContextFromDatabase(
+      env.DB,
       buildId,
       stepIndex,
+    );
+
+    if (!contextResult.success) {
+      const statusCode = contextResult.error === "Build not found" ? 404 : 400;
+      return c.json(
+        {
+          error: {
+            code: statusCode === 404 ? "NOT_FOUND" : "VALIDATION_ERROR",
+            message: contextResult.error,
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        statusCode,
+      );
+    }
+
+    // Generate options using AI
+    const generator = new OptionGenerator(
+      env.GEMINI_API_KEY,
+      env.GEMINI_MODEL,
+      env.DB,
+      env.GEMINI_API_BASE_URL,
+    );
+
+    const result = await generator.generate({ context: contextResult.context });
+
+    if (!result.success) {
+      return c.json(
+        {
+          error: {
+            code: "AI_ERROR",
+            message: result.error ?? "Failed to generate options",
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        500,
+      );
+    }
+
+    // Save shown options for analytics and caching
+    await saveShownOptions(env.DB, buildId, stepIndex, result.data!);
+
+    return c.json({
+      buildId,
+      stepIndex,
+      componentType: contextResult.context.componentType,
+      remainingBudget: contextResult.context.remainingBudget,
+      options: result.data!.options,
+      cached: false,
+      latencyMs: result.latencyMs,
       requestId: c.get("requestId"),
-    },
-    501,
-  );
+    });
+  } catch (error) {
+    console.error("Error generating options:", error);
+    return c.json(
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to generate options",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
+  }
 });
 
 /**
@@ -342,20 +442,161 @@ routes.get("/builds/:id/step/:n/options", async (c) => {
  * Saves the selected option and advances to next step
  */
 routes.post("/builds/:id/step/:n/select", async (c) => {
+  const env = c.env;
   const buildId = c.req.param("id");
   const stepIndex = parseInt(c.req.param("n"), 10);
 
-  // TODO: Implement selection logic
-  // For now, return a stub response
-  return c.json(
-    {
-      message: "Selection not yet implemented",
+  // Validate step index
+  if (isNaN(stepIndex) || stepIndex < 0 || stepIndex > 2) {
+    return c.json(
+      {
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Step index must be 0, 1, or 2",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      400,
+    );
+  }
+
+  try {
+    const body = await c.req.json<{
+      productName: string;
+      brand: string;
+      price: number;
+      productUrl?: string;
+      imageUrl?: string;
+      keySpec: string;
+      compatibilityNote: string;
+      reviewScore?: number;
+      reviewUrl?: string;
+      tier: "budget" | "midrange" | "premium";
+    }>();
+
+    // Validate required fields
+    if (!body.productName || !body.brand || !body.price || !body.keySpec) {
+      return c.json(
+        {
+          error: {
+            code: "VALIDATION_ERROR",
+            message:
+              "Missing required fields: productName, brand, price, keySpec",
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        400,
+      );
+    }
+
+    // Verify build exists and is in correct state
+    const build = await env.DB.prepare("SELECT * FROM builds WHERE id = ?")
+      .bind(buildId)
+      .first();
+
+    if (!build) {
+      return c.json(
+        {
+          error: {
+            code: "NOT_FOUND",
+            message: "Build not found",
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        404,
+      );
+    }
+
+    if (build.status !== "in_progress") {
+      return c.json(
+        {
+          error: {
+            code: "INVALID_STATE",
+            message: "Build is not in progress",
+          },
+          requestId: c.get("requestId"),
+          timestamp: new Date().toISOString(),
+        },
+        409,
+      );
+    }
+
+    // Update the build item with selected product
+    await env.DB.prepare(
+      `UPDATE build_items
+       SET product_name = ?, product_brand = ?, product_price = ?,
+           product_url = ?, product_image_url = ?, product_specs = ?,
+           review_score = ?, review_url = ?, compatibility_note = ?,
+           selected_at = datetime('now')
+       WHERE build_id = ? AND step_index = ?`,
+    )
+      .bind(
+        body.productName,
+        body.brand,
+        body.price,
+        body.productUrl || null,
+        body.imageUrl || null,
+        body.keySpec,
+        body.reviewScore || null,
+        body.reviewUrl || null,
+        body.compatibilityNote || null,
+        buildId,
+        stepIndex,
+      )
+      .run();
+
+    // Update current_step in builds table
+    const nextStep = stepIndex + 1;
+    const isComplete = nextStep > 2;
+
+    if (isComplete) {
+      await env.DB.prepare(
+        `UPDATE builds
+         SET current_step = ?, status = 'completed', completed_at = datetime('now'), updated_at = datetime('now')
+         WHERE id = ?`,
+      )
+        .bind(nextStep, buildId)
+        .run();
+    } else {
+      await env.DB.prepare(
+        `UPDATE builds
+         SET current_step = ?, updated_at = datetime('now')
+         WHERE id = ?`,
+      )
+        .bind(nextStep, buildId)
+        .run();
+    }
+
+    return c.json({
       buildId,
       stepIndex,
+      selected: {
+        productName: body.productName,
+        brand: body.brand,
+        price: body.price,
+        tier: body.tier,
+      },
+      nextStep: isComplete ? null : nextStep,
+      isComplete,
       requestId: c.get("requestId"),
-    },
-    501,
-  );
+    });
+  } catch (error) {
+    console.error("Error selecting option:", error);
+    return c.json(
+      {
+        error: {
+          code: "INTERNAL_ERROR",
+          message: "Failed to save selection",
+        },
+        requestId: c.get("requestId"),
+        timestamp: new Date().toISOString(),
+      },
+      500,
+    );
+  }
 });
 
 /**

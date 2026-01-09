@@ -4,4 +4,5 @@
  * Exports all AI agent services for BuildMate.
  */
 
-export * from './structure';
+export * from "./structure";
+export * from "./options";
