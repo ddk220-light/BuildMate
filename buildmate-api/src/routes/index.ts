@@ -530,7 +530,10 @@ routes.post("/builds/:id/step/:n/select", async (c) => {
        SET product_name = ?, product_brand = ?, product_price = ?,
            product_url = ?, product_image_url = ?, product_specs = ?,
            review_score = ?, review_url = ?, compatibility_note = ?,
-           selected_at = datetime('now')
+           selected_at = COALESCE(selected_at, datetime('now')),
+           modification_count = COALESCE(modification_count, 0) +
+             CASE WHEN selected_at IS NOT NULL THEN 1 ELSE 0 END,
+           modified_at = CASE WHEN selected_at IS NOT NULL THEN datetime('now') ELSE NULL END
        WHERE build_id = ? AND step_index = ?`,
     )
       .bind(
@@ -549,7 +552,8 @@ routes.post("/builds/:id/step/:n/select", async (c) => {
       .run();
 
     // Update current_step in builds table
-    const nextStep = stepIndex + 1;
+    // Use Math.max to prevent step regression when modifying previous selections
+    const nextStep = Math.max(build.current_step as number, stepIndex + 1);
     const isComplete = nextStep > 2;
 
     if (isComplete) {
