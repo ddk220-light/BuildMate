@@ -1,0 +1,54 @@
+name = "buildmate"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Enable static assets serving from public directory
+assets = { directory = "./public" }
+
+# Environment variables (secrets should be set via dashboard/wrangler)
+[vars]
+ENVIRONMENT = "production"
+GEMINI_MODEL = "gemini-2.5-flash-lite-preview-06-2025"
+GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
+APP_VERSION = "1.0.0"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "buildmate-db"
+database_id = "YOUR_DATABASE_ID"  # Replace after creating database
+
+# KV Namespace for caching
+[[kv_namespaces]]
+binding = "CACHE"
+id = "YOUR_KV_ID"  # Replace after creating namespace
+
+# R2 bucket for file storage (optional)
+# [[r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = "buildmate-storage"
+
+# Rate limiting
+# [[unsafe.bindings]]
+# name = "RATE_LIMITER"
+# type = "ratelimit"
+# namespace_id = "1"
+# simple = { limit = 100, period = 60 }
+
+# Development environment overrides
+[env.development]
+vars = { ENVIRONMENT = "development", GEMINI_MODEL = "gemini-2.5-flash-lite-preview-06-2025", GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta", APP_VERSION = "1.0.0" }
+
+[env.staging]
+vars = { ENVIRONMENT = "staging", GEMINI_MODEL = "gemini-2.5-flash-lite-preview-06-2025", GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/v1beta", APP_VERSION = "1.0.0" }
+
+# Development settings
+[dev]
+port = 8787
+local_protocol = "http"
+
+# Build configuration
+[build]
+command = "npm run build"
+watch_dir = "src"

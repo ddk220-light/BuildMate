@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BuildMate - AI-Powered Shopping Assistant for Complex Product Builds">
+  <title>BuildMate - AI Shopping Assistant</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-content">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          <h1>BuildMate</h1>
+        </div>
+        <p class="tagline">AI-Powered Shopping Assistant for Complex Product Builds</p>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="hero">
+        <h2>Build Smarter, Not Harder</h2>
+        <p>Let AI help you create the perfect product configuration with compatibility checks and expert recommendations.</p>
+      </section>
+
+      <section class="builder-section">
+        <div class="card">
+          <h3>Start Your Build</h3>
+          <form id="build-form" class="build-form">
+            <div class="form-group">
+              <label for="description">What are you building?</label>
+              <textarea
+                id="description"
+                name="description"
+                placeholder="Describe your project (e.g., Gaming PC for 1440p gaming, Smart home automation system, etc.)"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="budget-min">Min Budget ($)</label>
+                <input type="number" id="budget-min" name="budgetMin" placeholder="500" min="0" required>
+              </div>
+              <div class="form-group">
+                <label for="budget-max">Max Budget ($)</label>
+                <input type="number" id="budget-max" name="budgetMax" placeholder="2000" min="0" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <span>Create Build</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14m-7-7 7 7-7 7"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h4>Compatibility Checks</h4>
+          <p>Automatic verification that all components work together seamlessly.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <h4>AI Recommendations</h4>
+          <p>Smart suggestions based on your requirements and budget.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <h4>Budget Optimization</h4>
+          <p>Get the best value within your specified price range.</p>
+        </div>
+      </section>
+
+      <section id="build-result" class="build-result hidden">
+        <div class="card">
+          <h3>Your Build</h3>
+          <div id="result-content"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; 2024 BuildMate. Powered by Cloudflare Workers.</p>
+      <div class="footer-links">
+        <a href="/api">API</a>
+        <a href="/api/health">Status</a>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
