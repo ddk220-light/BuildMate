@@ -5,6 +5,8 @@
  * Replaces the inline budget table.
  */
 
+import { useTheme } from '../../contexts/ThemeContext';
+
 interface BudgetWidgetProps {
   budgetMin: number;
   budgetMax: number;
@@ -18,6 +20,17 @@ export function BudgetWidget({
   spent,
   className = "",
 }: BudgetWidgetProps) {
+  const { theme } = useTheme();
+
+  // Theme-aware gradient colors for SVG (CSS vars don't work in SVG stop elements)
+  const gradientColors = {
+    neutral: { from: '#3b82f6', to: '#6366f1' },
+    gaming: { from: '#06b6d4', to: '#d946ef' },
+    creative: { from: '#f59e0b', to: '#e11d48' },
+    budget: { from: '#059669', to: '#0d9488' },
+  };
+  const colors = gradientColors[theme];
+
   const remaining = budgetMax - spent;
   const isOverBudget = spent > budgetMax;
   const percentage = Math.min((spent / budgetMax) * 100, 100);
@@ -54,8 +67,8 @@ export function BudgetWidget({
               x2="100%"
               y2="0%"
             >
-              <stop offset="0%" stopColor="#3B82F6" />
-              <stop offset="100%" stopColor="#8B5CF6" />
+              <stop offset="0%" stopColor={colors.from} />
+              <stop offset="100%" stopColor={colors.to} />
             </linearGradient>
             <linearGradient
               id="overBudgetGradient"

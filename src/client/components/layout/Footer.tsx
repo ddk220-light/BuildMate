@@ -11,7 +11,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} BuildMate. All rights reserved.
           </p>
           <p className="text-sm text-gray-400">
-            AI recommendations may not be 100% accurate. Please verify compatibility before purchasing.
+            AI-selected parts may not be 100% accurate. Always verify compatibility and check current prices before purchasing.
           </p>
         </div>
       </div>

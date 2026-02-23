@@ -85,7 +85,7 @@ export function ComponentRoadmap({
                     relative w-10 h-10 rounded-full flex items-center justify-center
                     transition-all duration-300 font-semibold text-sm
                     ${state === "completed" ? "bg-green-500 text-white" : ""}
-                    ${state === "current" ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white ring-4 ring-blue-100" : ""}
+                    ${state === "current" ? "gradient-bg text-white ring-4 ring-[var(--color-accent-surface)]" : ""}
                     ${state === "upcoming" ? "border-2 border-gray-300 text-gray-400 bg-white" : ""}
                     ${state === "locked" ? "bg-amber-100 border-2 border-amber-400 text-amber-600" : ""}
                   `}
@@ -124,7 +124,7 @@ export function ComponentRoadmap({
 
                   {/* Pulsing animation for current step */}
                   {state === "current" && (
-                    <span className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-25" />
+                    <span className="absolute inset-0 rounded-full bg-[var(--gradient-from)] animate-ping opacity-25" />
                   )}
                 </div>
 
@@ -132,7 +132,7 @@ export function ComponentRoadmap({
                 <span
                   className={`
                     mt-2 text-xs font-medium text-center max-w-[90px] truncate
-                    ${state === "current" ? "text-blue-600 font-semibold" : ""}
+                    ${state === "current" ? "text-[var(--color-accent)] font-semibold" : ""}
                     ${state === "completed" ? "text-gray-700" : ""}
                     ${state === "upcoming" ? "text-gray-400" : ""}
                     ${state === "locked" ? "text-amber-600" : ""}
@@ -146,7 +146,7 @@ export function ComponentRoadmap({
                 <span
                   className={`
                     text-[10px] mt-0.5 max-w-[90px] truncate
-                    ${state === "current" ? "text-blue-500" : "text-gray-400"}
+                    ${state === "current" ? "text-[var(--color-accent)]" : "text-gray-400"}
                   `}
                   title={
                     selectedProduct ||
@@ -167,7 +167,7 @@ export function ComponentRoadmap({
                   className={`
                     h-0.5 w-12 mx-2 transition-all
                     ${state === "completed" || state === "locked" ? "bg-gradient-to-r from-green-400 to-green-500" : ""}
-                    ${state === "current" ? "bg-gradient-to-r from-blue-400 to-gray-300" : ""}
+                    ${state === "current" ? "bg-gradient-to-r from-[var(--gradient-from)] to-gray-300" : ""}
                     ${state === "upcoming" ? "bg-gray-200 border-t border-dashed border-gray-300" : ""}
                   `}
                   style={

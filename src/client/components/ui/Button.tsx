@@ -14,11 +14,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses = {
   primary:
-    "bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500 disabled:bg-blue-300",
+    "gradient-bg text-white focus:ring-[var(--color-focus)] disabled:opacity-50",
   secondary:
     "bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500 disabled:bg-gray-100",
   outline:
-    "border-2 border-blue-500 text-blue-500 hover:bg-blue-50 focus:ring-blue-500 disabled:border-gray-300 disabled:text-gray-400",
+    "border-2 border-[var(--color-accent)] text-[var(--color-accent)] hover:bg-[var(--color-accent-surface)] focus:ring-[var(--color-focus)] disabled:border-gray-300 disabled:text-gray-400",
 };
 
 const sizeClasses = {

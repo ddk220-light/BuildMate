@@ -48,7 +48,7 @@ export function IconButton({
         w-9 h-9 flex items-center justify-center
         rounded-lg text-gray-500
         transition-all duration-200
-        hover:bg-gray-100 hover:text-gray-700
+        hover:bg-[var(--color-accent-surface)] hover:text-[var(--color-accent)]
         active:scale-95
         disabled:opacity-50 disabled:cursor-not-allowed
         ${className}

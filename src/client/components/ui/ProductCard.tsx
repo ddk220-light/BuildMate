@@ -25,8 +25,8 @@ export function ProductCard({
         flex flex-col h-full min-h-[200px]
         ${
           isSelected
-            ? "border-blue-500 ring-2 ring-blue-100 shadow-lg bg-blue-50/30"
-            : "border-gray-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5"
+            ? "border-[var(--color-accent)] ring-2 ring-[var(--color-accent-surface)] shadow-lg bg-[var(--color-accent-surface)]"
+            : "border-gray-200 hover:border-[var(--color-border-accent)] hover:shadow-md hover:-translate-y-0.5"
         }
       `}
       onClick={onSelect}
@@ -41,7 +41,7 @@ export function ProductCard({
     >
       {/* Best For Badge */}
       <div className="mb-3">
-        <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 border border-purple-200">
+        <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-[var(--color-accent-surface)] text-[var(--color-accent)] border border-[var(--color-border-accent)]">
           <svg
             className="w-4 h-4 mr-1.5 flex-shrink-0"
             fill="currentColor"
@@ -75,8 +75,8 @@ export function ProductCard({
             w-7 h-7 rounded-full flex items-center justify-center transition-all
             ${
               isSelected
-                ? "bg-blue-500"
-                : "border-2 border-gray-300 hover:border-blue-400"
+                ? "gradient-bg"
+                : "border-2 border-gray-300 hover:border-[var(--color-accent)]"
             }
           `}
         >

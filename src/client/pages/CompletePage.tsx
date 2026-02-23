@@ -19,6 +19,7 @@ import { api, ApiClientError } from "../lib/api";
 import { localStorageService, apiToLocalBuild } from "../lib/localStorage";
 import { useToast } from "../hooks/useToast";
 import { useTracking } from "../contexts/TrackingContext";
+import { useTheme } from "../contexts/ThemeContext";
 import type { Build, BuildItem, SetupStep } from "../types/api";
 
 const FEEDBACK_STORAGE_KEY = "buildmate_feedback_status";
@@ -49,6 +50,7 @@ export function CompletePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { trackEvent } = useTracking();
+  const { detectAndApply } = useTheme();
 
   // Get build ID from query parameter
   const id = searchParams.get("id");
@@ -73,6 +75,7 @@ export function CompletePage() {
         const response = await api.getBuild(id);
         setBuild(response.build);
         setItems(response.items);
+        detectAndApply(response.build.description);
       } catch (err) {
         if (err instanceof ApiClientError) {
           setError(err.message);
@@ -256,7 +259,7 @@ export function CompletePage() {
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" className="mx-auto mb-4" />
-          <p className="text-gray-600">Loading your build...</p>
+          <p className="text-gray-600">Loading your PC build...</p>
         </div>
       </div>
     );
@@ -270,7 +273,7 @@ export function CompletePage() {
             Build Not Found
           </h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <Button onClick={() => navigate("/")}>Start New Build</Button>
+          <Button onClick={() => navigate("/")}>Start New PC Build</Button>
         </div>
       </div>
     );
@@ -284,7 +287,7 @@ export function CompletePage() {
           <span className="text-3xl">🎉</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-1">
-          Build Complete!
+          PC Build Complete!
         </h1>
         <p className="text-gray-500 text-lg">
           {build.structure?.buildCategory || "Your Build"}
@@ -305,21 +308,21 @@ export function CompletePage() {
         />
       </div>
 
-      {/* Primary CTA - View Setup Steps */}
+      {/* Primary CTA - View Assembly Guide */}
       <div className="w-full max-w-[450px] mx-auto mb-4">
         <button
           onClick={handleViewSetupSteps}
           className="w-full h-14 flex items-center justify-center gap-2
-            bg-gradient-to-r from-blue-500 to-purple-500
-            hover:from-blue-600 hover:to-purple-600
+            gradient-bg
+            hover:opacity-90
             text-white font-semibold text-lg rounded-xl
-            shadow-[0_4px_12px_rgba(59,130,246,0.3)]
-            hover:shadow-[0_6px_16px_rgba(59,130,246,0.4)]
+            shadow-lg
+            hover:shadow-xl
             hover:scale-[1.02]
             transition-all duration-200"
         >
           <span>📋</span>
-          View Setup Steps
+          View Assembly Guide
         </button>
       </div>
 
@@ -337,7 +340,7 @@ export function CompletePage() {
           onClick={() => navigate("/")}
           className="flex-1"
         >
-          Start New Build
+          Start New PC Build
         </Button>
       </div>
 
