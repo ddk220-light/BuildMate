@@ -72,7 +72,8 @@ export type AgentType =
   | "option"
   | "instruction"
   | "existing_items"
-  | "setup_steps";
+  | "setup_steps"
+  | "skill_detector";
 
 export interface AILogEntry {
   id: string;
