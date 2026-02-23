@@ -14,10 +14,8 @@ import type {
   SetupStepsResponse,
 } from "../types/api";
 
-// Use relative URL in development (proxied by Vite), absolute URL in production
-const API_BASE_URL = import.meta.env.DEV
-  ? "/api"
-  : "https://buildmate-api.deepakdhanavel.workers.dev/api";
+// Use relative URL for all environments since the Node server serves both frontend and API
+const API_BASE_URL = "/api";
 
 /** Default request timeout in milliseconds */
 const REQUEST_TIMEOUT_MS = 30000;
