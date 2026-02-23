@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+/* Custom styles for BuildMate */
+:root {
+    /* Primary gradient colors */
+    --color-blue: #3b82f6;
+    --color-purple: #8b5cf6;
+
+    /* Accent colors */
+    --color-teal: #14b8a6;
+    --color-amber: #f59e0b;
+    --color-green: #10b981;
+
+    /* Neutral colors */
+    --color-text-primary: #1f2937;
+    --color-text-secondary: #6b7280;
+    --color-background: #f0f9ff;
+    --color-background-subtle: #f9fafb;
+    --color-surface: #ffffff;
+    --color-border: #e5e7eb;
+
+    /* Legacy aliases */
+    --color-primary: #3b82f6;
+    --color-primary-dark: #2563eb;
+    --color-secondary: #10b981;
+    --color-text: #1f2937;
+    --color-text-muted: #6b7280;
+    --color-error: #ef4444;
+    --color-warning: #f59e0b;
+    --color-success: #10b981;
+}
+
+/* Gradient utilities */
+.gradient-text {
+    background: linear-gradient(135deg, var(--color-blue), var(--color-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, var(--color-blue), var(--color-purple));
+}
+
+.gradient-border {
+    background: linear-gradient(90deg, var(--color-blue), var(--color-purple));
+}
+
+/* Drawer animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.drawer-enter {
+    animation: slideInRight 250ms ease-out forwards;
+}
+
+.drawer-exit {
+    animation: slideOutRight 250ms ease-in forwards;
+}
+
+.overlay-enter {
+    animation: fadeIn 200ms ease forwards;
+}
+
+.overlay-exit {
+    animation: fadeOut 200ms ease forwards;
+}
+
+/* Modal animations */
+@keyframes modalScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal-enter {
+    animation: modalScaleIn 200ms ease-out forwards;
+}
+
+.modal-overlay-enter {
+    animation: fadeIn 200ms ease forwards;
+}
+
+/* Toast animations */
+@keyframes toastSlideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.toast-enter {
+    animation: toastSlideUp 200ms ease-out forwards;
+}
+
+/* Celebration animations */
+@keyframes celebrationPop {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.celebration-pop {
+    animation: celebrationPop 400ms ease-out forwards;
+}
+
+/* Fade up animation for staggered reveals */
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-up {
+    animation: fadeUp 300ms ease-out forwards;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .drawer-enter,
+    .drawer-exit,
+    .overlay-enter,
+    .overlay-exit,
+    .modal-enter,
+    .modal-overlay-enter,
+    .toast-enter,
+    .celebration-pop,
+    .fade-up {
+        animation: none;
+    }
+
+    .drawer-enter {
+        transform: translateX(0);
+    }
+
+    .overlay-enter,
+    .modal-overlay-enter,
+    .modal-enter,
+    .toast-enter,
+    .celebration-pop,
+    .fade-up {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+body {
+    font-family:
+        "Inter",
+        system-ui,
+        -apple-system,
+        sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    min-height: 100vh;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-background);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+}
