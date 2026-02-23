@@ -17,6 +17,7 @@ import {
   getCachedOptions,
   saveShownOptions,
 } from "../lib/agents";
+import { detectSkill } from '../lib/skills';
 
 // Create router with typed bindings
 const routes = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -107,6 +108,29 @@ routes.post("/builds", async (c) => {
         existingItemsText,
       )
       .run();
+
+    // Detect domain skill for this build (non-blocking — if it fails, build continues without skill)
+    try {
+      const detection = await detectSkill(
+        body.description.trim(),
+        buildId,
+        env.GEMINI_API_KEY,
+        env.GEMINI_MODEL,
+        env.DB,
+        env.GEMINI_API_BASE_URL,
+      );
+
+      if (detection.skillId) {
+        await env.DB.prepare(
+          `UPDATE builds SET skill_id = ?, skill_confidence = ? WHERE id = ?`,
+        )
+          .bind(detection.skillId, detection.confidence, buildId)
+          .run();
+      }
+    } catch (err) {
+      // Skill detection failure should not block build creation
+      console.error('Skill detection failed (non-blocking):', err);
+    }
 
     return c.json(
       {
