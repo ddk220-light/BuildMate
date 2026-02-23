@@ -201,11 +201,10 @@ export function HomePage() {
 
                 {/* Collapsible Examples */}
                 <div
-                  className={`overflow-hidden transition-all duration-200 ease-out ${
-                    showExamples
+                  className={`overflow-hidden transition-all duration-200 ease-out ${showExamples
                       ? "max-h-40 opacity-100 mt-3"
                       : "max-h-0 opacity-0"
-                  }`}
+                    }`}
                 >
                   <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex flex-wrap gap-2">
@@ -241,6 +240,7 @@ export function HomePage() {
                       type="number"
                       value={budgetMin}
                       onChange={(e) => setBudgetMin(e.target.value)}
+                      onFocus={(e) => e.target.select()}
                       placeholder="Min"
                       min="0"
                       step="100"
@@ -257,6 +257,7 @@ export function HomePage() {
                       type="number"
                       value={budgetMax}
                       onChange={(e) => setBudgetMax(e.target.value)}
+                      onFocus={(e) => e.target.select()}
                       placeholder="Max"
                       min="0"
                       step="100"
