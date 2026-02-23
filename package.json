@@ -16,7 +16,11 @@
     },
     "dependencies": {
         "@hono/node-server": "^1.13.7",
+        "cli-table3": "^0.6.5",
+        "commander": "^14.0.3",
+        "csv-stringify": "^6.6.0",
         "dotenv": "^16.4.5",
+        "facebook-nodejs-business-sdk": "^24.0.1",
         "hono": "^4.11.3",
         "pg": "^8.13.1",
         "react": "^19.2.0",
