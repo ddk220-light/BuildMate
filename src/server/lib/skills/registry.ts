@@ -6,9 +6,12 @@
  */
 
 import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { parseSkillFile } from './parser';
 import type { Skill, SkillMetadata } from './types';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /** In-memory skill index */
 const skills = new Map<string, Skill>();

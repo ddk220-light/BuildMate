@@ -2,7 +2,11 @@ import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import * as dotenv from 'dotenv';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Load .env variables
 dotenv.config();
@@ -14,7 +18,6 @@ import { getDbPool, D1ToPgAdapter } from './db';
 import { initializeRegistry } from './lib/skills';
 
 // Initialize domain skill registry before routes are registered.
-// In dev (tsx), __dirname is src/server/; in prod (tsup bundle), it is dist/server/.
 // The registry gracefully handles a missing directory with a warning.
 initializeRegistry(resolve(__dirname, 'lib', 'skills', 'domains'));
 
