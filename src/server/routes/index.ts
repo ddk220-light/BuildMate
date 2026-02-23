@@ -178,7 +178,7 @@ routes.get("/builds/:id", async (c) => {
     let structure = null;
     if (build.structure_json) {
       try {
-        structure = JSON.parse(build.structure_json as string);
+        structure = typeof build.structure_json === 'string' ? JSON.parse(build.structure_json) : build.structure_json;
       } catch {
         console.error("Failed to parse structure_json for build:", buildId);
       }
@@ -761,7 +761,7 @@ routes.post("/builds/:id/step/:n/select", async (c) => {
     let structure = null;
     if (build.structure_json) {
       try {
-        structure = JSON.parse(build.structure_json as string);
+        structure = typeof build.structure_json === 'string' ? JSON.parse(build.structure_json) : build.structure_json;
       } catch {
         console.error("Failed to parse structure_json for build:", buildId);
       }
@@ -867,7 +867,7 @@ routes.post("/builds/:id/complete", async (c) => {
     let expectedComponents = 3;
     if (build.structure_json) {
       try {
-        const structure = JSON.parse(build.structure_json as string);
+        const structure = typeof build.structure_json === 'string' ? JSON.parse(build.structure_json) : build.structure_json;
         expectedComponents = structure.components?.length || 3;
       } catch {
         console.error("Failed to parse structure_json for build:", buildId);
@@ -985,7 +985,7 @@ routes.get("/builds/:id/setup-steps", async (c) => {
 
     if (cached?.response_json) {
       try {
-        const cachedResponse = JSON.parse(cached.response_json);
+        const cachedResponse = typeof cached.response_json === 'string' ? JSON.parse(cached.response_json) : cached.response_json;
         if (cachedResponse.success && cachedResponse.data?.steps) {
           return c.json({
             buildId,
@@ -1119,7 +1119,7 @@ routes.get("/builds/:id/export", async (c) => {
 
     // Parse structure for component info
     const structure = build.structure_json
-      ? JSON.parse(build.structure_json as string)
+      ? (typeof build.structure_json === 'string' ? JSON.parse(build.structure_json) : build.structure_json)
       : null;
 
     // Format for export (v2.0)
@@ -1329,7 +1329,7 @@ routes.get("/shared/:code", async (c) => {
     // Parse the build data
     let buildData;
     try {
-      buildData = JSON.parse(shared.build_data as string);
+      buildData = typeof shared.build_data === 'string' ? JSON.parse(shared.build_data) : shared.build_data;
     } catch {
       return c.json(
         {

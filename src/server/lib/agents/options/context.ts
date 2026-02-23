@@ -62,7 +62,7 @@ export async function buildContextFromDatabase(
 
   let structure: StructureData;
   try {
-    structure = JSON.parse(build.structure_json);
+    structure = typeof build.structure_json === 'string' ? JSON.parse(build.structure_json) : build.structure_json as unknown as StructureData;
   } catch {
     return { success: false, error: "Build structure data is corrupted" };
   }
@@ -153,7 +153,7 @@ export async function getCachedOptions(
 
   if (cached) {
     try {
-      return JSON.parse(cached.options_json);
+      return typeof cached.options_json === 'string' ? JSON.parse(cached.options_json) : cached.options_json as unknown as OptionGeneratorOutput;
     } catch {
       // Cache is corrupted, return null to regenerate
       return null;

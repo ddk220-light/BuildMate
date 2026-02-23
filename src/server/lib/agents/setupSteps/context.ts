@@ -80,7 +80,7 @@ export async function buildContextFromDatabase(
 
   if (build.structure_json) {
     try {
-      const structure = JSON.parse(build.structure_json);
+      const structure = typeof build.structure_json === 'string' ? JSON.parse(build.structure_json) : build.structure_json;
       buildCategory = structure.buildCategory || "custom";
       buildName = structure.buildName || "Your Build";
     } catch {
