@@ -75,6 +75,7 @@ export function buildUserPrompt(
   buildName: string,
   description: string,
   items: BuildItemForPrompt[],
+  skillContent?: string,
 ): string {
   let prompt = `## Completed Build
 
@@ -96,6 +97,10 @@ export function buildUserPrompt(
 
   prompt += `
 Generate 3-5 functional setup steps that group these components logically. Focus on completing functions, not installing components one-by-one. Keep the total word count under 500 words.`;
+
+  if (skillContent) {
+    prompt += `\n\n## Domain Expertise\n\nUse the following assembly guide to create more accurate, domain-specific setup steps:\n\n${skillContent}`;
+  }
 
   return prompt;
 }

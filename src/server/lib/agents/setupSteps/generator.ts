@@ -10,6 +10,7 @@ import {
   setupStepsSchema,
   type SetupStepsOutput,
 } from "../../gemini/schemas";
+import { getSkillSectionsForAgent } from "../../skills";
 import { SETUP_STEPS_SYSTEM_PROMPT, buildUserPrompt } from "./prompt";
 import type { SetupStepsContext } from "./context";
 
@@ -57,11 +58,16 @@ export class SetupStepsGenerator {
   ): Promise<SetupStepsGeneratorResult> {
     const { context } = input;
 
+    const skillContent = context.skillId
+      ? getSkillSectionsForAgent(context.skillId, 'setupSteps')
+      : undefined;
+
     const userPrompt = buildUserPrompt(
       context.buildCategory,
       context.buildName,
       context.description,
       context.items,
+      skillContent,
     );
 
     const fullPrompt = `${SETUP_STEPS_SYSTEM_PROMPT}\n\n${userPrompt}`;

@@ -25,6 +25,7 @@ export interface SetupStepsContext {
   buildName: string;
   description: string;
   items: SetupStepsBuildItem[];
+  skillId?: string | null;
 }
 
 /**
@@ -46,7 +47,7 @@ export async function buildContextFromDatabase(
   // Fetch the build
   const build = await db
     .prepare(
-      `SELECT id, description, structure_json, status
+      `SELECT id, description, structure_json, status, skill_id
        FROM builds
        WHERE id = ?`,
     )
@@ -56,6 +57,7 @@ export async function buildContextFromDatabase(
       description: string;
       structure_json: string | null;
       status: string;
+      skill_id: string | null;
     }>();
 
   if (!build) {
@@ -128,6 +130,7 @@ export async function buildContextFromDatabase(
       buildName,
       description: build.description,
       items,
+      skillId: build.skill_id,
     },
   };
 }
