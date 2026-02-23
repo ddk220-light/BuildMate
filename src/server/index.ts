@@ -11,6 +11,12 @@ import type { Env, Variables } from './types/env';
 import { requestIdMiddleware, corsMiddleware, loggingMiddleware } from './middleware';
 import routes from './routes';
 import { getDbPool, D1ToPgAdapter } from './db';
+import { initializeRegistry } from './lib/skills';
+
+// Initialize domain skill registry before routes are registered.
+// In dev (tsx), __dirname is src/server/; in prod (tsup bundle), it is dist/server/.
+// The registry gracefully handles a missing directory with a warning.
+initializeRegistry(resolve(__dirname, 'lib', 'skills', 'domains'));
 
 // Create Hono app with typed bindings
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
