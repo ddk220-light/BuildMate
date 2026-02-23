@@ -84,6 +84,7 @@ export interface OptionGeneratorContext {
     brand: string;
     price: number;
   }>;
+  skillContent?: string;
 }
 
 /**
@@ -100,7 +101,7 @@ export function buildUserPrompt(context: OptionGeneratorContext): string {
           .join("\n")
       : "  None selected yet";
 
-  return `## Build Context
+  const basePrompt = `## Build Context
 
 **Build Category**: ${context.buildCategory}
 **Original Description**: ${context.description}
@@ -121,4 +122,10 @@ ${previousItemsText}
 **Suggested Budget Allocation**: ${context.budgetAllocationPercent}% of total (~$${context.suggestedAllocation.toFixed(2)})
 
 Please recommend exactly 3 product options for "${context.componentType}" - each optimized for a different use case or functionality. All options should be at similar price points within the remaining budget of $${context.remainingBudget.toFixed(2)}.`;
+
+  if (context.skillContent) {
+    return basePrompt + `\n\n## Domain Expertise\n\nUse the following domain-specific knowledge to improve your product recommendations and compatibility checks:\n\n${context.skillContent}`;
+  }
+
+  return basePrompt;
 }

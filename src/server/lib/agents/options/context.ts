@@ -6,6 +6,7 @@
 
 import type { OptionGeneratorOutput } from "../../gemini/schemas";
 import type { OptionGeneratorContext } from "./prompt";
+import { getSkillSectionsForAgent } from '../../skills';
 
 interface BuildRow {
   id: string;
@@ -14,6 +15,7 @@ interface BuildRow {
   budget_max: number;
   structure_json: string;
   current_step: number;
+  skill_id: string | null;
 }
 
 interface BuildItemRow {
@@ -131,6 +133,11 @@ export async function buildContextFromDatabase(
         price: item.product_price || 0,
       })),
   };
+
+  // Load domain skill content if available
+  if (build.skill_id) {
+    context.skillContent = getSkillSectionsForAgent(build.skill_id, 'options');
+  }
 
   return { success: true, context };
 }
