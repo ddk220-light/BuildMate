@@ -33,7 +33,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-gradient-to-b from-white to-blue-50/50">
+      <header className="sticky top-0 z-40 bg-[var(--color-bg-card)]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
@@ -60,7 +60,7 @@ export function Header() {
                     d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
                   />
                 </svg>
-                Your Builds
+                My PC Builds
                 {buildCount > 0 && (
                   <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full gradient-bg text-xs font-medium text-white">
                     {buildCount > 9 ? "9+" : buildCount}

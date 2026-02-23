@@ -249,7 +249,7 @@ export function BuildsDrawer({ isOpen, onClose }: BuildsDrawerProps) {
         {/* Drawer Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <h2 id="drawer-title" className="text-xl font-bold text-gray-900">
-            Your Builds
+            My PC Builds
           </h2>
           <button
             onClick={handleClose}
@@ -331,9 +331,9 @@ export function BuildsDrawer({ isOpen, onClose }: BuildsDrawerProps) {
                   />
                 </svg>
               </div>
-              <p className="text-gray-500">No builds yet.</p>
+              <p className="text-gray-500">No PC builds yet.</p>
               <p className="text-sm text-gray-400">
-                Create your first build to get started!
+                Create your first PC build to get started!
               </p>
             </div>
           ) : (
@@ -375,7 +375,7 @@ export function BuildsDrawer({ isOpen, onClose }: BuildsDrawerProps) {
                         e.stopPropagation();
                         handleViewBuild(build);
                       }}
-                      className="flex-1 rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100"
+                      className="flex-1 rounded-lg bg-[var(--color-accent-surface)] px-3 py-1.5 text-sm font-medium text-[var(--color-accent)] transition-colors hover:opacity-80"
                     >
                       {build.status === "completed" ? "View" : "Continue"}
                     </button>

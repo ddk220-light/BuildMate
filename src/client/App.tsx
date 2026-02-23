@@ -19,25 +19,28 @@ import {
 } from "./pages";
 import { BuildsProvider } from "./contexts/BuildsContext";
 import { TrackingProvider } from "./contexts/TrackingContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 function App() {
   return (
     <ErrorBoundary>
-      <TrackingProvider>
-        <BuildsProvider>
-          <BrowserRouter>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/build" element={<BuildPage />} />
-                <Route path="/complete" element={<CompletePage />} />
-                <Route path="/s/:code" element={<SharedBuildPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </Layout>
-          </BrowserRouter>
-        </BuildsProvider>
-      </TrackingProvider>
+      <ThemeProvider>
+        <TrackingProvider>
+          <BuildsProvider>
+            <BrowserRouter>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/build" element={<BuildPage />} />
+                  <Route path="/complete" element={<CompletePage />} />
+                  <Route path="/s/:code" element={<SharedBuildPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Layout>
+            </BrowserRouter>
+          </BuildsProvider>
+        </TrackingProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

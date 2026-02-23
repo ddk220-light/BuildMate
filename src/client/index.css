@@ -1,50 +1,172 @@
 @import "tailwindcss";
 
-/* Custom styles for BuildMate */
-:root {
-    /* Primary gradient colors */
-    --color-blue: #3b82f6;
-    --color-purple: #8b5cf6;
+/* ===== THEME: Neutral (Default) ===== */
+:root,
+[data-theme="neutral"] {
+    /* Accent */
+    --color-accent: #475569;
+    --color-accent-light: #64748b;
+    --color-accent-dark: #334155;
+    --color-accent-surface: #f1f5f9;
 
-    /* Accent colors */
-    --color-teal: #14b8a6;
-    --color-amber: #f59e0b;
-    --color-green: #10b981;
+    /* Gradient */
+    --gradient-from: #3b82f6;
+    --gradient-to: #6366f1;
+    --gradient-angle: 135deg;
 
-    /* Neutral colors */
-    --color-text-primary: #1f2937;
-    --color-text-secondary: #6b7280;
-    --color-background: #f0f9ff;
-    --color-background-subtle: #f9fafb;
-    --color-surface: #ffffff;
-    --color-border: #e5e7eb;
+    /* Backgrounds */
+    --color-bg-page: #f8fafc;
+    --color-bg-card: #ffffff;
+    --color-bg-subtle: #f1f5f9;
 
-    /* Legacy aliases */
-    --color-primary: #3b82f6;
-    --color-primary-dark: #2563eb;
-    --color-secondary: #10b981;
-    --color-text: #1f2937;
-    --color-text-muted: #6b7280;
+    /* Borders */
+    --color-border: #e2e8f0;
+    --color-border-accent: #cbd5e1;
+
+    /* Text */
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94a3b8;
+
+    /* Status */
+    --color-success: #10b981;
     --color-error: #ef4444;
     --color-warning: #f59e0b;
-    --color-success: #10b981;
+
+    /* Effects */
+    --shadow-glow: none;
+    --bg-noise: none;
+
+    /* Typography */
+    --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Interactive */
+    --color-focus: #3b82f6;
+    --color-spinner: #3b82f6;
 }
 
-/* Gradient utilities */
+/* ===== THEME: Gaming ===== */
+[data-theme="gaming"] {
+    --color-accent: #06b6d4;
+    --color-accent-light: #22d3ee;
+    --color-accent-dark: #0891b2;
+    --color-accent-surface: #ecfeff;
+
+    --gradient-from: #06b6d4;
+    --gradient-to: #d946ef;
+    --gradient-angle: 135deg;
+
+    --color-bg-page: #f0fdfa;
+    --color-bg-card: #ffffff;
+    --color-bg-subtle: #ecfeff;
+
+    --color-border: #cffafe;
+    --color-border-accent: #a5f3fc;
+
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94a3b8;
+
+    --shadow-glow: 0 0 20px rgba(6, 182, 212, 0.2), 0 0 40px rgba(217, 70, 239, 0.1);
+
+    --font-heading: 'Rajdhani', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+
+    --color-focus: #06b6d4;
+    --color-spinner: #06b6d4;
+}
+
+/* ===== THEME: Creative ===== */
+[data-theme="creative"] {
+    --color-accent: #d97706;
+    --color-accent-light: #f59e0b;
+    --color-accent-dark: #b45309;
+    --color-accent-surface: #fffbeb;
+
+    --gradient-from: #f59e0b;
+    --gradient-to: #e11d48;
+    --gradient-angle: 135deg;
+
+    --color-bg-page: #fffbeb;
+    --color-bg-card: #ffffff;
+    --color-bg-subtle: #fef3c7;
+
+    --color-border: #fde68a;
+    --color-border-accent: #fcd34d;
+
+    --color-text-primary: #1c1917;
+    --color-text-secondary: #57534e;
+    --color-text-muted: #a8a29e;
+
+    --shadow-glow: none;
+
+    --font-heading: 'Libre Baskerville', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+
+    --color-focus: #f59e0b;
+    --color-spinner: #f59e0b;
+}
+
+/* ===== THEME: Budget ===== */
+[data-theme="budget"] {
+    --color-accent: #059669;
+    --color-accent-light: #10b981;
+    --color-accent-dark: #047857;
+    --color-accent-surface: #ecfdf5;
+
+    --gradient-from: #059669;
+    --gradient-to: #0d9488;
+    --gradient-angle: 135deg;
+
+    --color-bg-page: #f0fdf4;
+    --color-bg-card: #ffffff;
+    --color-bg-subtle: #ecfdf5;
+
+    --color-border: #a7f3d0;
+    --color-border-accent: #6ee7b7;
+
+    --color-text-primary: #022c22;
+    --color-text-secondary: #3f6212;
+    --color-text-muted: #86efac;
+
+    --shadow-glow: none;
+
+    --font-heading: 'Source Sans 3', system-ui, sans-serif;
+    --font-body: 'Source Sans 3', system-ui, sans-serif;
+
+    --color-focus: #059669;
+    --color-spinner: #059669;
+}
+
+/* ===== Gradient Utilities ===== */
 .gradient-text {
-    background: linear-gradient(135deg, var(--color-blue), var(--color-purple));
+    background: linear-gradient(var(--gradient-angle), var(--gradient-from), var(--gradient-to));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .gradient-bg {
-    background: linear-gradient(135deg, var(--color-blue), var(--color-purple));
+    background: linear-gradient(var(--gradient-angle), var(--gradient-from), var(--gradient-to));
+    box-shadow: var(--shadow-glow);
 }
 
 .gradient-border {
-    background: linear-gradient(90deg, var(--color-blue), var(--color-purple));
+    background: linear-gradient(90deg, var(--gradient-from), var(--gradient-to));
 }
+
+/* ===== Gaming Glow Effects ===== */
+[data-theme="gaming"] .gradient-bg {
+    box-shadow: var(--shadow-glow);
+}
+
+[data-theme="gaming"] .gradient-bg:hover {
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.3), 0 0 60px rgba(217, 70, 239, 0.15);
+}
+
+/* ===== Animations ===== */
 
 /* Drawer animations */
 @keyframes slideInRight {
@@ -197,22 +319,29 @@
         opacity: 1;
         transform: none;
     }
+
+    body {
+        transition: none !important;
+    }
 }
 
+/* ===== Base Styles ===== */
 body {
-    font-family:
-        "Inter",
-        system-ui,
-        -apple-system,
-        sans-serif;
-    background-color: var(--color-background);
-    color: var(--color-text);
+    font-family: var(--font-body);
+    background-color: var(--color-bg-page);
+    color: var(--color-text-primary);
     min-height: 100vh;
+    transition: background-color 0.3s ease;
+}
+
+/* Heading typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
 }
 
 /* Focus styles for accessibility */
 *:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
 }
 
@@ -223,7 +352,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--color-background);
+    background: var(--color-bg-page);
 }
 
 ::-webkit-scrollbar-thumb {

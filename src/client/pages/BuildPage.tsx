@@ -16,6 +16,7 @@ import {
 } from "../components/ui";
 import { api, ApiClientError } from "../lib/api";
 import { useTracking } from "../contexts/TrackingContext";
+import { useTheme } from "../contexts/ThemeContext";
 import type { Build, BuildItem, ProductOption } from "../types/api";
 
 interface OptionsResponse {
@@ -31,6 +32,7 @@ export function BuildPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { trackEvent } = useTracking();
+  const { detectAndApply } = useTheme();
 
   // Get build ID from query parameter
   const id = searchParams.get("id");
@@ -70,6 +72,7 @@ export function BuildPage() {
       setBuild(response.build);
       setItems(response.items);
       setBuildName(response.build.buildName || null);
+      detectAndApply(response.build.description);
       return response;
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -245,7 +248,7 @@ export function BuildPage() {
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" className="mx-auto mb-4" />
-          <p className="text-gray-600">Loading your build...</p>
+          <p className="text-gray-600">Loading your PC build...</p>
         </div>
       </div>
     );
@@ -276,7 +279,7 @@ export function BuildPage() {
           <p className="text-gray-600 mb-6">
             {error || "This build does not exist."}
           </p>
-          <Button onClick={() => navigate("/")}>Start New Build</Button>
+          <Button onClick={() => navigate("/")}>Start New PC Build</Button>
         </div>
       </div>
     );
@@ -299,11 +302,11 @@ export function BuildPage() {
     totalSteps > 0 ? (completedSteps / totalSteps) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50/50 to-white">
+    <div className="min-h-screen">
       {/* Overall Progress Bar */}
       <div className="h-1 bg-gray-200">
         <div
-          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+          className="h-full gradient-bg transition-all duration-500"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -397,7 +400,7 @@ export function BuildPage() {
                     <div className="text-center">
                       <Spinner size="lg" className="mx-auto mb-4" />
                       <p className="text-gray-600">
-                        Finding the best options for you...
+                        Finding the best parts for you...
                       </p>
                     </div>
                   </div>
@@ -441,7 +444,7 @@ export function BuildPage() {
                         ${confirmedOption.price.toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-500 mt-4">
-                        Moving to next component...
+                        Moving to next part...
                       </p>
                     </div>
                   </div>
@@ -492,7 +495,7 @@ export function BuildPage() {
         ) : (
           /* No Structure Yet - Auto-initialize or show loading */
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-[var(--color-accent-surface)] rounded-full flex items-center justify-center mx-auto mb-4">
               {isInitializing ? (
                 <Spinner size="lg" />
               ) : (
@@ -506,12 +509,12 @@ export function BuildPage() {
             </h2>
             <p className="text-gray-600 mb-6">
               {isInitializing
-                ? "AI is determining the best components for your project. This may take a few seconds..."
-                : "Click below to start analyzing your build requirements."}
+                ? "AI is finding the best parts for your PC. This may take a few seconds..."
+                : "Click below to start analyzing your PC build requirements."}
             </p>
             {!isInitializing && (
               <Button size="lg" onClick={handleInitialize}>
-                Start Analysis →
+                Analyze My Build →
               </Button>
             )}
           </div>
@@ -524,7 +527,7 @@ export function BuildPage() {
           </Button>
           {build.status === "completed" && (
             <Button onClick={() => navigate(`/complete?id=${id}`)}>
-              View Complete Build →
+              View Complete PC Build →
             </Button>
           )}
         </div>

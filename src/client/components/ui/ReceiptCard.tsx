@@ -40,7 +40,7 @@ export function ReceiptCard({
   return (
     <div className="w-full max-w-[450px] mx-auto bg-white rounded-2xl border border-gray-200 shadow-[0_4px_24px_rgba(0,0,0,0.08)]">
       {/* Accent line at top */}
-      <div className="h-1 rounded-t-2xl bg-gradient-to-r from-blue-500 to-purple-500" />
+      <div className="h-1 rounded-t-2xl gradient-bg" />
 
       {/* Header with description and actions */}
       <div className="px-6 pt-5 pb-4 flex items-start justify-between gap-4">
@@ -70,7 +70,7 @@ export function ReceiptCard({
             className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
           >
             {/* Number badge */}
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-full gradient-bg flex items-center justify-center shrink-0">
               <span className="text-xs font-semibold text-white">
                 {index + 1}
               </span>

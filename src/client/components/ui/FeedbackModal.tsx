@@ -170,7 +170,7 @@ export function FeedbackModal({
                     }
                   }}
                   placeholder="What did you like? What could be better?"
-                  className="w-full h-28 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-sm"
+                  className="w-full h-28 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] resize-none text-sm"
                   disabled={isSubmitting}
                 />
                 <div className="absolute bottom-3 right-3 text-xs text-gray-400">
@@ -193,7 +193,7 @@ export function FeedbackModal({
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !feedback.trim()}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 border-0"
+                className="gradient-bg hover:opacity-90 border-0"
               >
                 {isSubmitting ? (
                   <>

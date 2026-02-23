@@ -122,7 +122,7 @@ export function FeedbackForm({ buildId, onSubmit }: FeedbackFormProps) {
             }
           }}
           placeholder="What did you like? What could be better? Any suggestions?"
-          className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+          className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] resize-none"
           disabled={isSubmitting}
         />
         <div className="absolute bottom-3 right-3 text-xs text-gray-400">

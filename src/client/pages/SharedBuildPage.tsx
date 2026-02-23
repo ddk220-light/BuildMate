@@ -11,12 +11,14 @@ import { api, ApiClientError } from "../lib/api";
 import { localStorageService, type LocalBuild } from "../lib/localStorage";
 import { useBuilds } from "../contexts/BuildsContext";
 import { useTracking } from "../contexts/TrackingContext";
+import { useTheme } from "../contexts/ThemeContext";
 
 export function SharedBuildPage() {
   const { code } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const { addBuild } = useBuilds();
   const { trackEvent } = useTracking();
+  const { detectAndApply } = useTheme();
   const [build, setBuild] = useState<LocalBuild | null>(null);
   const [sharedAt, setSharedAt] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +34,7 @@ export function SharedBuildPage() {
         const response = await api.getSharedBuild(code);
         setBuild(response.build as LocalBuild);
         setSharedAt(response.sharedAt);
+        detectAndApply((response.build as LocalBuild).description);
       } catch (err) {
         if (err instanceof ApiClientError) {
           setError(err.message);
@@ -84,7 +87,7 @@ export function SharedBuildPage() {
       <div className="min-h-[400px] flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" className="mx-auto mb-4" />
-          <p className="text-gray-600">Loading shared build...</p>
+          <p className="text-gray-600">Loading shared PC build...</p>
         </div>
       </div>
     );
@@ -115,7 +118,7 @@ export function SharedBuildPage() {
           <p className="text-gray-600 mb-6">
             {error || "This shared build does not exist or has been removed."}
           </p>
-          <Button onClick={() => navigate("/")}>Go to Homepage</Button>
+          <Button onClick={() => navigate("/")}>Start a New Build</Button>
         </div>
       </div>
     );
@@ -148,7 +151,7 @@ export function SharedBuildPage() {
             </svg>
           </div>
           <div>
-            <p className="font-medium text-purple-900">Shared Build</p>
+            <p className="font-medium text-purple-900">Shared PC Build</p>
             <p className="text-sm text-purple-600">
               Shared on{" "}
               {sharedAt
@@ -185,7 +188,7 @@ export function SharedBuildPage() {
               Cloning...
             </>
           ) : (
-            "Clone to My Builds"
+            "Clone to My PC Builds"
           )}
         </Button>
       </div>
@@ -217,7 +220,7 @@ export function SharedBuildPage() {
       {/* Build Items */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-gray-900">
-          Components ({build.items.length})
+          PC Parts ({build.items.length})
         </h2>
 
         {build.items.map((item, index) => (
@@ -332,10 +335,10 @@ export function SharedBuildPage() {
       {/* Actions */}
       <div className="mt-8 flex gap-4">
         <Button variant="outline" onClick={() => navigate("/")}>
-          ← Go to Homepage
+          ← Start a New Build
         </Button>
         <Button onClick={handleClone} disabled={isCloning || cloneSuccess}>
-          {cloneSuccess ? "Cloned!" : "Clone to My Builds"}
+          {cloneSuccess ? "Cloned!" : "Clone to My PC Builds"}
         </Button>
       </div>
     </div>

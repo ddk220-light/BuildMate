@@ -3,18 +3,19 @@
  * Compact layout with all inputs above the fold
  */
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input, Textarea } from "../components/ui";
 import { api, ApiClientError } from "../lib/api";
 import { useTracking } from "../contexts/TrackingContext";
+import { useTheme } from "../contexts/ThemeContext";
 
 const EXAMPLE_PROMPTS = [
   "A gaming PC for 1440p that can run Cyberpunk",
-  "A suitable dress set for a black tie dinner",
-  "An astrophotography setup without a telescope",
-  "A bike for occasional hiking tracks",
-  "An electric skateboard for stunts",
+  "Budget build under $600 for schoolwork and light gaming",
+  "Video editing workstation for 4K content creation",
+  "Compact ITX build for my living room",
+  "Streaming PC with RTX 4070 and 32GB RAM",
 ];
 
 export function HomePage() {
@@ -33,14 +34,29 @@ export function HomePage() {
   // Track partially created build for recovery
   const [pendingBuildId, setPendingBuildId] = useState<string | null>(null);
 
+  const { detectAndApply } = useTheme();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  // Debounced theme detection (500ms) while typing
+  const handleDescriptionChange = useCallback((value: string) => {
+    setDescription(value);
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    debounceTimer.current = setTimeout(() => {
+      detectAndApply(value);
+    }, 500);
+  }, [detectAndApply]);
+
   const handleExampleClick = (example: string) => {
     setDescription(example);
     setShowExamples(false);
+    detectAndApply(example);
   };
 
   const validateForm = (): boolean => {
     if (!description.trim()) {
-      setError("Please describe what you want to build");
+      setError("Please describe the PC you want to build");
       return false;
     }
 
@@ -105,6 +121,9 @@ export function HomePage() {
     setError(null);
     setPendingBuildId(null);
 
+    // Apply theme based on final description
+    detectAndApply(description);
+
     try {
       // Step 1: Create the build
       const response = await api.createBuild({
@@ -152,18 +171,18 @@ export function HomePage() {
       {/* Compact Explainer Section */}
       <div className="text-center mb-6">
         <h1 className="text-3xl font-bold gradient-text mb-2">
-          Build Smarter with AI
+          Build Your Perfect PC
         </h1>
         <div className="mx-auto w-12 h-0.5 gradient-bg rounded-full mb-3" />
         <p className="text-gray-500">
-          Describe what you want to build, set your budget, and get AI-selected
-          compatible components.
+          Describe your ideal PC, set your budget, and get AI-selected
+          compatible parts.
         </p>
       </div>
 
       {/* Main Input Card */}
       <form onSubmit={handleSubmit}>
-        <div className="bg-white rounded-2xl shadow-lg border-l-4 border-l-blue-500 p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-lg border-l-4 border-l-[var(--gradient-from)] p-6 md:p-8">
           {/* Two-column grid */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Left Column - 60% */}
@@ -174,13 +193,13 @@ export function HomePage() {
                   htmlFor="description"
                   className="block text-sm font-medium text-gray-900 mb-1.5"
                 >
-                  What would you like to build?
+                  What kind of PC do you want?
                 </label>
                 <Textarea
                   id="description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe your project... e.g., 'A gaming PC for 1440p that can run Cyberpunk'"
+                  onChange={(e) => handleDescriptionChange(e.target.value)}
+                  placeholder="Describe your ideal PC... e.g., 'A gaming PC for 1440p that can run Cyberpunk'"
                   rows={4}
                   className="w-full resize-none text-base"
                 />
@@ -191,7 +210,7 @@ export function HomePage() {
                 <button
                   type="button"
                   onClick={() => setShowExamples(!showExamples)}
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[var(--color-accent)] transition-colors"
                 >
                   <span>💡</span>
                   <span className="underline underline-offset-2">
@@ -213,7 +232,7 @@ export function HomePage() {
                           key={example}
                           type="button"
                           onClick={() => handleExampleClick(example)}
-                          className="px-3 py-1.5 text-sm bg-white hover:bg-blue-50 text-gray-700 hover:text-blue-700 rounded-full border border-gray-200 hover:border-blue-200 transition-colors"
+                          className="px-3 py-1.5 text-sm bg-white hover:bg-[var(--color-accent-surface)] text-gray-700 hover:text-[var(--color-accent)] rounded-full border border-gray-200 hover:border-[var(--color-border-accent)] transition-colors"
                         >
                           {example}
                         </button>
@@ -274,14 +293,14 @@ export function HomePage() {
                   htmlFor="existing-items"
                   className="block text-sm font-medium text-gray-900 mb-1.5"
                 >
-                  Existing Components{" "}
+                  Existing Parts{" "}
                   <span className="font-normal text-gray-400">(optional)</span>
                 </label>
                 <Textarea
                   id="existing-items"
                   value={existingItems}
                   onChange={(e) => setExistingItems(e.target.value)}
-                  placeholder="Items you already have... e.g., NVIDIA RTX 4070, Corsair 750W PSU"
+                  placeholder="Parts you already have... e.g., NVIDIA RTX 4070, Corsair 750W PSU"
                   rows={3}
                   className="w-full resize-none text-sm"
                 />
@@ -300,7 +319,7 @@ export function HomePage() {
                     type="button"
                     onClick={retryInit}
                     disabled={isLoading}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50"
+                    className="px-4 py-2 text-sm font-medium text-white gradient-bg hover:opacity-90 rounded-lg disabled:opacity-50"
                   >
                     Retry AI Analysis
                   </button>
@@ -348,9 +367,9 @@ export function HomePage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  {loadingStage === "creating" && "Creating build..."}
+                  {loadingStage === "creating" && "Setting up your PC build..."}
                   {loadingStage === "analyzing" &&
-                    "AI analyzing your requirements..."}
+                    "AI selecting the best parts..."}
                 </span>
               ) : (
                 "Start Building →"
@@ -360,11 +379,11 @@ export function HomePage() {
 
           {/* Loading Progress Indicator */}
           {isLoading && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-4 p-4 bg-[var(--color-accent-surface)] border border-[var(--color-border-accent)] rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0">
                   {loadingStage === "creating" ? (
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-[var(--gradient-from)] flex items-center justify-center">
                       <svg
                         className="w-4 h-4 text-white animate-pulse"
                         fill="none"
@@ -380,7 +399,7 @@ export function HomePage() {
                       </svg>
                     </div>
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-[var(--gradient-to)] flex items-center justify-center">
                       <svg
                         className="w-4 h-4 text-white animate-pulse"
                         fill="none"
@@ -398,12 +417,12 @@ export function HomePage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-blue-900">
-                    {loadingStage === "creating" && "Setting up your build..."}
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                    {loadingStage === "creating" && "Configuring your PC build..."}
                     {loadingStage === "analyzing" &&
-                      "AI is determining the best components for your project"}
+                      "AI is finding the best parts for your PC"}
                   </p>
-                  <p className="text-xs text-blue-600 mt-0.5">
+                  <p className="text-xs text-[var(--color-accent)] mt-0.5">
                     {loadingStage === "creating" && "This takes just a moment"}
                     {loadingStage === "analyzing" &&
                       "This may take a few seconds"}
@@ -413,12 +432,12 @@ export function HomePage() {
               {/* Progress dots */}
               <div className="flex gap-1.5 mt-3 justify-center">
                 <div
-                  className={`w-2 h-2 rounded-full ${loadingStage === "creating" || loadingStage === "analyzing" ? "bg-blue-500" : "bg-blue-200"}`}
+                  className={`w-2 h-2 rounded-full ${loadingStage === "creating" || loadingStage === "analyzing" ? "bg-[var(--gradient-from)]" : "bg-[var(--color-border)]"}`}
                 />
                 <div
-                  className={`w-2 h-2 rounded-full ${loadingStage === "analyzing" ? "bg-blue-500" : "bg-blue-200"}`}
+                  className={`w-2 h-2 rounded-full ${loadingStage === "analyzing" ? "bg-[var(--gradient-from)]" : "bg-[var(--color-border)]"}`}
                 />
-                <div className="w-2 h-2 rounded-full bg-blue-200" />
+                <div className="w-2 h-2 rounded-full bg-[var(--color-border)]" />
               </div>
             </div>
           )}

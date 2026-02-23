@@ -21,7 +21,7 @@ function getStatusBadge(status: string) {
     case "in_progress":
       return {
         label: "In Progress",
-        className: "bg-blue-100 text-blue-700 border-blue-200",
+        className: "bg-[var(--color-accent-surface)] text-[var(--color-accent)] border-[var(--color-border-accent)]",
       };
     case "completed":
       return {
@@ -124,11 +124,11 @@ export function BuildHeader({
                 onKeyDown={handleKeyDown}
                 onBlur={handleSave}
                 maxLength={50}
-                className="text-xl font-bold text-gray-900 bg-white border border-blue-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[200px]"
+                className="text-xl font-bold text-gray-900 bg-white border border-[var(--color-border-accent)] rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] w-[200px]"
                 disabled={isSaving}
               />
               {isSaving && (
-                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
               )}
             </div>
           ) : (
@@ -140,7 +140,7 @@ export function BuildHeader({
                 <button
                   type="button"
                   onClick={handleStartEdit}
-                  className="p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                  className="p-1 text-gray-400 hover:text-[var(--color-accent)] transition-colors flex-shrink-0"
                   title="Rename build"
                 >
                   <svg
@@ -189,7 +189,7 @@ export function BuildHeader({
                 className={`h-full transition-all duration-300 ${
                   isOverBudget
                     ? "bg-gradient-to-r from-red-400 to-red-500"
-                    : "bg-gradient-to-r from-blue-400 to-purple-500"
+                    : "gradient-bg"
                 }`}
                 style={{ width: `${progressPercent}%` }}
               />

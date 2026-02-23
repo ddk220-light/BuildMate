@@ -113,14 +113,14 @@ export function SetupStepsPanel({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
               <span className="text-white text-lg">📋</span>
             </div>
             <h2
               id="setup-steps-title"
               className="text-xl font-bold text-gray-900"
             >
-              Setup Steps
+              Assembly Guide
             </h2>
           </div>
           <button
@@ -152,7 +152,7 @@ export function SetupStepsPanel({
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-16">
               <Spinner size="lg" className="mb-4" />
-              <p className="text-gray-500">Generating setup steps...</p>
+              <p className="text-gray-500">Generating assembly guide...</p>
             </div>
           )}
 
@@ -177,7 +177,7 @@ export function SetupStepsPanel({
                 >
                   {/* Step Header */}
                   <div className="flex items-start gap-3 mb-3">
-                    <span className="text-2xl text-blue-500 leading-none">
+                    <span className="text-2xl text-[var(--color-accent)] leading-none">
                       {stepIcons[index] || `${step.stepNumber}.`}
                     </span>
                     <h3 className="font-semibold text-gray-900 text-lg leading-tight">
@@ -208,9 +208,9 @@ export function SetupStepsPanel({
                   {/* Tip */}
                   {step.tip && (
                     <div className="pl-9 mt-3">
-                      <div className="flex items-start gap-2 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
+                      <div className="flex items-start gap-2 rounded-lg bg-[var(--color-accent-surface)] border border-[var(--color-border-accent)] px-3 py-2">
                         <span className="text-sm leading-none mt-0.5">💡</span>
-                        <p className="text-xs text-blue-700 leading-relaxed">
+                        <p className="text-xs text-[var(--color-accent)] leading-relaxed">
                           {step.tip}
                         </p>
                       </div>
@@ -222,7 +222,7 @@ export function SetupStepsPanel({
               {/* Footer note */}
               <div className="text-center pt-4 pb-2">
                 <p className="text-xs text-gray-400">
-                  Steps are tailored to your specific build
+                  Steps are tailored to your specific PC build
                 </p>
               </div>
             </div>
@@ -233,7 +233,7 @@ export function SetupStepsPanel({
               <div className="mb-4 rounded-full bg-gray-100 p-4">
                 <span className="text-2xl">📋</span>
               </div>
-              <p className="text-gray-500">No setup steps available</p>
+              <p className="text-gray-500">No assembly steps available</p>
             </div>
           )}
         </div>
