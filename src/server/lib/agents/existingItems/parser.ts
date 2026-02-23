@@ -33,6 +33,7 @@ export interface ParsedItem {
 export interface ExistingItemsParserInput {
   buildId: string;
   existingItemsText: string;
+  skillContent?: string;
 }
 
 /**
@@ -79,7 +80,7 @@ export class ExistingItemsParser {
       };
     }
 
-    const userPrompt = buildExistingItemsPrompt(input.existingItemsText);
+    const userPrompt = buildExistingItemsPrompt(input.existingItemsText, input.skillContent);
     const fullPrompt = `${EXISTING_ITEMS_PARSER_SYSTEM_PROMPT}\n\n${userPrompt}`;
 
     // Call the Gemini API

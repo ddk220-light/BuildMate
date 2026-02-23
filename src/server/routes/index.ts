@@ -17,7 +17,7 @@ import {
   getCachedOptions,
   saveShownOptions,
 } from "../lib/agents";
-import { detectSkill } from '../lib/skills';
+import { detectSkill, getSkillSectionsForAgent } from '../lib/skills';
 
 // Create router with typed bindings
 const routes = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -380,6 +380,14 @@ routes.post("/builds/:id/init", async (c) => {
       );
     }
 
+    // Load domain skill content if detected
+    const skillContent = build.skill_id
+      ? getSkillSectionsForAgent(build.skill_id as string, 'structure')
+      : undefined;
+    const existingItemsSkillContent = build.skill_id
+      ? getSkillSectionsForAgent(build.skill_id as string, 'existingItems')
+      : undefined;
+
     // 3. Parse existing items if present
     let parsedExistingItems: Array<{
       originalText: string;
@@ -402,6 +410,7 @@ routes.post("/builds/:id/init", async (c) => {
       const parseResult = await parser.parse({
         buildId,
         existingItemsText,
+        skillContent: existingItemsSkillContent,
       });
 
       if (parseResult.success && parseResult.data) {
@@ -443,6 +452,7 @@ routes.post("/builds/:id/init", async (c) => {
       budgetMin: build.budget_min as number,
       budgetMax: build.budget_max as number,
       existingItems: parsedExistingItems,
+      skillContent,
     });
 
     if (!result.success) {

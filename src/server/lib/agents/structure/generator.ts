@@ -33,6 +33,7 @@ export interface StructureGeneratorInput {
   budgetMin: number;
   budgetMax: number;
   existingItems?: ParsedExistingItem[];
+  skillContent?: string;
 }
 
 /**
@@ -75,6 +76,7 @@ export class StructureGenerator {
       input.budgetMin,
       input.budgetMax,
       input.existingItems,
+      input.skillContent,
     );
 
     const fullPrompt = `${STRUCTURE_GENERATOR_SYSTEM_PROMPT}\n\n${userPrompt}`;

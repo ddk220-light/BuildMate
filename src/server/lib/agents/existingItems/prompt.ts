@@ -104,12 +104,18 @@ Output:
 /**
  * Build the user prompt for parsing existing items
  */
-export function buildExistingItemsPrompt(existingItemsText: string): string {
-  return `## User's Existing Items
+export function buildExistingItemsPrompt(existingItemsText: string, skillContent?: string): string {
+  let prompt = `## User's Existing Items
 
 Please parse the following text and extract information about each item the user already owns:
 
 "${existingItemsText}"
 
 Extract each item with its product name, brand, category, estimated price, and key specification. If any text cannot be parsed as a product, include it in unrecognizedText.`;
+
+  if (skillContent) {
+    prompt += `\n\n## Domain Expertise\n\nUse the following domain knowledge to better identify components and their specifications:\n\n${skillContent}`;
+  }
+
+  return prompt;
 }

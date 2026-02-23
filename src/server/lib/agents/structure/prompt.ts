@@ -96,6 +96,7 @@ export function buildUserPrompt(
   budgetMin: number,
   budgetMax: number,
   existingItems?: ExistingItemForPrompt[],
+  skillContent?: string,
 ): string {
   let prompt = `## User's Build Request
 
@@ -125,6 +126,10 @@ The user already has the following items. Do NOT recommend components in these c
   prompt += `
 
 Please analyze this request and determine the 3-5 most critical components for this build (excluding any categories covered by existing items). Order them by compatibility impact (most critical first) and allocate budget percentages appropriately.`;
+
+  if (skillContent) {
+    prompt += `\n\n## Domain Expertise\n\nUse the following domain-specific knowledge to improve your component selection, ordering, and budget allocation:\n\n${skillContent}`;
+  }
 
   return prompt;
 }
