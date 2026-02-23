@@ -67,14 +67,16 @@ export class OptionGenerator {
       maxTokens: 4096,
     });
 
-    // Log the AI call
-    const logEntry = createAILogEntry(
-      input.context.buildId,
-      "option",
-      fullPrompt,
-      response,
-    );
-    await saveAILog(this.db, logEntry);
+    // Log the AI call asynchronously
+    Promise.resolve().then(async () => {
+      const logEntry = createAILogEntry(
+        input.context.buildId,
+        "option",
+        fullPrompt,
+        response,
+      );
+      await saveAILog(this.db, logEntry);
+    }).catch(err => console.error("Failed to save AI log (option generator):", err));
 
     // Handle API failure
     if (!response.success) {

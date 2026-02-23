@@ -91,14 +91,16 @@ export class ExistingItemsParser {
       maxTokens: 2048,
     });
 
-    // Log the AI call
-    const logEntry = createAILogEntry(
-      input.buildId,
-      "existing_items",
-      fullPrompt,
-      response
-    );
-    await saveAILog(this.db, logEntry);
+    // Log the AI call asynchronously to prevent blocking the response
+    Promise.resolve().then(async () => {
+      const logEntry = createAILogEntry(
+        input.buildId,
+        "existing_items",
+        fullPrompt,
+        response
+      );
+      await saveAILog(this.db, logEntry);
+    }).catch(err => console.error("Failed to save AI log (existing_items):", err));
 
     // Handle API failure
     if (!response.success) {
