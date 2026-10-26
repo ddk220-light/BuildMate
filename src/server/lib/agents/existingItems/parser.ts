@@ -1,3 +1,4 @@
+import type { D1ToPgAdapter } from '../../../db.js';
 /**
  * Existing Items Parser Service
  *
@@ -5,15 +6,15 @@
  * structured information about each item.
  */
 
-import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini";
+import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini/index.js";
 import {
   existingItemsParserSchema,
   type ExistingItemsParserOutput,
-} from "../../gemini/schemas";
+} from "../../gemini/schemas.js";
 import {
   EXISTING_ITEMS_PARSER_SYSTEM_PROMPT,
   buildExistingItemsPrompt,
-} from "./prompt";
+} from "./prompt.js";
 
 /**
  * Parsed item from user's existing items text
@@ -53,9 +54,9 @@ export interface ExistingItemsParserResult {
  */
 export class ExistingItemsParser {
   private client: GeminiClient;
-  private db: D1Database;
+  private db: D1ToPgAdapter;
 
-  constructor(apiKey: string, model: string, db: D1Database, baseUrl?: string) {
+  constructor(apiKey: string, model: string, db: D1ToPgAdapter, baseUrl?: string) {
     this.client = new GeminiClient({
       apiKey,
       model,

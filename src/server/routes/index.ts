@@ -6,7 +6,7 @@
 
 import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
-import type { Env, Variables } from "../types/env";
+import type { Env, Variables } from "../types/env.js";
 import {
   StructureGenerator,
   OptionGenerator,
@@ -16,8 +16,8 @@ import {
   buildSetupStepsContextFromDatabase,
   getCachedOptions,
   saveShownOptions,
-} from "../lib/agents";
-import { detectSkill, getSkillSectionsForAgent } from '../lib/skills';
+} from "../lib/agents/index.js";
+import { detectSkill, getSkillSectionsForAgent } from '../lib/skills/index.js';
 
 // Create router with typed bindings
 const routes = new Hono<{ Bindings: Env; Variables: Variables }>();

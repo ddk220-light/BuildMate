@@ -5,11 +5,11 @@ import { resolve } from 'path';
 // Load .env variables
 dotenv.config();
 
-import type { Env, Variables } from './types/env';
-import { requestIdMiddleware, corsMiddleware, loggingMiddleware } from './middleware';
-import routes from './routes';
-import { getDbPool, D1ToPgAdapter } from './db';
-import { initializeRegistry } from './lib/skills';
+import type { Env, Variables } from './types/env.js';
+import { requestIdMiddleware, corsMiddleware, loggingMiddleware } from './middleware/index.js';
+import routes from './routes/index.js';
+import { getDbPool, D1ToPgAdapter } from './db.js';
+import { initializeRegistry } from './lib/skills/index.js';
 
 // Initialize domain skill registry before routes are registered.
 // The registry gracefully handles a missing directory with a warning.

@@ -1,3 +1,4 @@
+import type { D1ToPgAdapter } from '../../../db.js';
 /**
  * Structure Generator Service
  *
@@ -5,12 +6,12 @@
  * and determines the 3 most critical components for their build.
  */
 
-import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini";
+import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini/index.js";
 import {
   structureGeneratorSchema,
   type StructureGeneratorOutput,
-} from "../../gemini/schemas";
-import { STRUCTURE_GENERATOR_SYSTEM_PROMPT, buildUserPrompt } from "./prompt";
+} from "../../gemini/schemas.js";
+import { STRUCTURE_GENERATOR_SYSTEM_PROMPT, buildUserPrompt } from "./prompt.js";
 
 /**
  * Parsed existing item from user input
@@ -54,9 +55,9 @@ export interface StructureGeneratorResult {
  */
 export class StructureGenerator {
   private client: GeminiClient;
-  private db: D1Database;
+  private db: D1ToPgAdapter;
 
-  constructor(apiKey: string, model: string, db: D1Database, baseUrl?: string) {
+  constructor(apiKey: string, model: string, db: D1ToPgAdapter, baseUrl?: string) {
     this.client = new GeminiClient({
       apiKey,
       model,

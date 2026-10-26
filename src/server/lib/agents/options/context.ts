@@ -1,12 +1,13 @@
+import type { D1ToPgAdapter } from '../../../db.js';
 /**
  * Build Context Builder for Option Generator
  *
  * Loads build state from database and formats it for the prompt.
  */
 
-import type { OptionGeneratorOutput } from "../../gemini/schemas";
-import type { OptionGeneratorContext } from "./prompt";
-import { getSkillSectionsForAgent } from '../../skills';
+import type { OptionGeneratorOutput } from "../../gemini/schemas.js";
+import type { OptionGeneratorContext } from "./prompt.js";
+import { getSkillSectionsForAgent } from '../../skills/index.js';
 
 interface BuildRow {
   id: string;
@@ -40,7 +41,7 @@ interface StructureData {
  * Build context from database for the Option Generator
  */
 export async function buildContextFromDatabase(
-  db: D1Database,
+  db: D1ToPgAdapter,
   buildId: string,
   stepIndex: number,
 ): Promise<
@@ -147,7 +148,7 @@ export async function buildContextFromDatabase(
  * Returns cached options if available
  */
 export async function getCachedOptions(
-  db: D1Database,
+  db: D1ToPgAdapter,
   buildId: string,
   stepIndex: number,
 ): Promise<OptionGeneratorOutput | null> {
@@ -173,7 +174,7 @@ export async function getCachedOptions(
  * Save shown options to database for analytics and caching
  */
 export async function saveShownOptions(
-  db: D1Database,
+  db: D1ToPgAdapter,
   buildId: string,
   stepIndex: number,
   options: OptionGeneratorOutput,

@@ -8,8 +8,8 @@
 import { readFileSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { parseSkillFile } from './parser';
-import type { Skill, SkillMetadata } from './types';
+import { parseSkillFile } from './parser.js';
+import type { Skill, SkillMetadata } from './types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

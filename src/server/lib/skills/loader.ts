@@ -5,8 +5,8 @@
  * This is the primary interface agents use to get domain expertise.
  */
 
-import { getSkill } from './registry';
-import { AGENT_SECTION_MAP, type SkillAgentType } from './types';
+import { getSkill } from './registry.js';
+import { AGENT_SECTION_MAP, type SkillAgentType } from './types.js';
 
 /**
  * Get concatenated skill sections relevant to a specific agent.

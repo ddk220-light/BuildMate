@@ -10,5 +10,15 @@
     {
       "path": "./tsconfig.server.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ]
+  }
 }

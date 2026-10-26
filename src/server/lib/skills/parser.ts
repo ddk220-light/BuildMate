@@ -5,7 +5,7 @@
  * No external YAML library needed — frontmatter is simple key-value pairs.
  */
 
-import type { SkillMetadata, SkillSection, Skill } from './types';
+import type { SkillMetadata, SkillSection, Skill } from './types.js';
 
 /**
  * Parse YAML frontmatter from a skill file.

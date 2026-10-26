@@ -1,6 +1,6 @@
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
-import app from './app';
+import app from './app.js';
 
 // Standalone server retained for local development and recovery.
 app.use('/*', serveStatic({ root: './dist/client' }));

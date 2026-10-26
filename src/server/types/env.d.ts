@@ -1,4 +1,4 @@
-import type { D1ToPgAdapter } from '../db';
+import type { D1ToPgAdapter } from '../db.js';
 
 /**
  * Environment bindings for Node.js

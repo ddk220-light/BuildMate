@@ -2,6 +2,6 @@
  * Gemini API Module Exports
  */
 
-export { GeminiClient, createAILogEntry, saveAILog } from './client';
-export * from './types';
-export * from './schemas';
+export { GeminiClient, createAILogEntry, saveAILog } from './client.js';
+export * from './types.js';
+export * from './schemas.js';
