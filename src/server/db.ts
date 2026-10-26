@@ -1,4 +1,5 @@
 import pg from 'pg';
+import { attachDatabasePool } from '@vercel/functions';
 const { Pool } = pg;
 
 // We create a single pool for the entire application lifecycle
@@ -13,9 +14,12 @@ export function getDbPool() {
         } else {
             pool = new Pool({
                 connectionString,
-                // Railway Postgres requires SSL usually? If so, uncomment:
-                // ssl: { rejectUnauthorized: false }
+                max: 3,
+                connectionTimeoutMillis: 10000,
+                idleTimeoutMillis: 10000,
+                allowExitOnIdle: true,
             });
+            if (process.env.VERCEL) attachDatabasePool(pool);
         }
     }
     return pool;

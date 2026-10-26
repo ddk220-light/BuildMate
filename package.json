@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "@hono/node-server": "^1.13.7",
+        "@vercel/functions": "^3.10.3",
         "dotenv": "^16.4.5",
         "hono": "^4.11.3",
         "pg": "^8.13.1",
