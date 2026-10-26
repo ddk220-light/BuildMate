@@ -5,7 +5,7 @@
  */
 
 import { createMiddleware } from 'hono/factory';
-import type { Env, Variables } from '../types/env';
+import type { Env, Variables } from '../types/env.js';
 
 export const loggingMiddleware = createMiddleware<{
   Bindings: Env;

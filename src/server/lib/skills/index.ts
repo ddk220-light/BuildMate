@@ -4,8 +4,8 @@
  * Exports all skill-related functionality.
  */
 
-export * from './types';
-export { parseSkillFile } from './parser';
-export { initializeRegistry, getSkill, getAllSkillMetadata, hasSkills, resetRegistry } from './registry';
-export { getSkillSectionsForAgent } from './loader';
-export { detectSkill } from './detector';
+export * from './types.js';
+export { parseSkillFile } from './parser.js';
+export { initializeRegistry, getSkill, getAllSkillMetadata, hasSkills, resetRegistry } from './registry.js';
+export { getSkillSectionsForAgent } from './loader.js';
+export { detectSkill } from './detector.js';

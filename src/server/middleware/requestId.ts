@@ -7,7 +7,7 @@
 
 import { createMiddleware } from 'hono/factory';
 import { v4 as uuidv4 } from 'uuid';
-import type { Env, Variables } from '../types/env';
+import type { Env, Variables } from '../types/env.js';
 
 export const requestIdMiddleware = createMiddleware<{
   Bindings: Env;

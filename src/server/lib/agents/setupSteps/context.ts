@@ -1,3 +1,4 @@
+import type { D1ToPgAdapter } from '../../../db.js';
 /**
  * Setup Steps Context Builder
  *
@@ -41,7 +42,7 @@ export interface SetupStepsContextResult {
  * Build context from the database for a completed build
  */
 export async function buildContextFromDatabase(
-  db: D1Database,
+  db: D1ToPgAdapter,
   buildId: string,
 ): Promise<SetupStepsContextResult> {
   // Fetch the build

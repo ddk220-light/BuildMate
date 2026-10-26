@@ -2,6 +2,6 @@
  * Middleware Exports
  */
 
-export { requestIdMiddleware } from './requestId';
-export { corsMiddleware, productionCorsMiddleware } from './cors';
-export { loggingMiddleware } from './logging';
+export { requestIdMiddleware } from './requestId.js';
+export { corsMiddleware, productionCorsMiddleware } from './cors.js';
+export { loggingMiddleware } from './logging.js';

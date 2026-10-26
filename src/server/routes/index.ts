@@ -6,7 +6,7 @@
 
 import { Hono } from "hono";
 import { v4 as uuidv4 } from "uuid";
-import type { Env, Variables } from "../types/env";
+import type { Env, Variables } from "../types/env.js";
 import {
   StructureGenerator,
   OptionGenerator,
@@ -16,8 +16,8 @@ import {
   buildSetupStepsContextFromDatabase,
   getCachedOptions,
   saveShownOptions,
-} from "../lib/agents";
-import { detectSkill, getSkillSectionsForAgent } from '../lib/skills';
+} from "../lib/agents/index.js";
+import { detectSkill, getSkillSectionsForAgent } from '../lib/skills/index.js';
 
 // Create router with typed bindings
 const routes = new Hono<{ Bindings: Env; Variables: Variables }>();
@@ -1146,10 +1146,7 @@ routes.get("/builds/:id/export", async (c) => {
       .bind(buildId)
       .first();
 
-    const baseUrl =
-      env.ENVIRONMENT === "production"
-        ? "https://buildmate-web.pages.dev"
-        : "http://localhost:5173";
+    const baseUrl = new URL(c.req.url).origin;
 
     // Parse structure for component info
     const structure = build.structure_json
@@ -1281,10 +1278,7 @@ routes.post("/builds/:id/share", async (c) => {
 
     if (existing) {
       // Return existing share URL
-      const baseUrl =
-        env.ENVIRONMENT === "production"
-          ? "https://buildmate-web.pages.dev"
-          : "http://localhost:5173";
+      const baseUrl = new URL(c.req.url).origin;
       return c.json({
         shareUrl: `${baseUrl}/s/${existing.share_code}`,
         shareCode: existing.share_code,
@@ -1303,10 +1297,7 @@ routes.post("/builds/:id/share", async (c) => {
       .bind(crypto.randomUUID(), buildId, shareCode, JSON.stringify(body.build))
       .run();
 
-    const baseUrl =
-      env.ENVIRONMENT === "production"
-        ? "https://buildmate-web.pages.dev"
-        : "http://localhost:5173";
+    const baseUrl = new URL(c.req.url).origin;
 
     return c.json({
       shareUrl: `${baseUrl}/s/${shareCode}`,

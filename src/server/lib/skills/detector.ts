@@ -1,3 +1,4 @@
+import type { D1ToPgAdapter } from '../../db.js';
 /**
  * Skill Detector Agent
  *
@@ -5,9 +6,9 @@
  * a user's build description. Returns confidence scores for each skill.
  */
 
-import { GeminiClient, createAILogEntry, saveAILog } from '../gemini';
-import { getAllSkillMetadata, hasSkills } from './registry';
-import { SKILL_CONFIDENCE_THRESHOLD, type SkillDetectionResult } from './types';
+import { GeminiClient, createAILogEntry, saveAILog } from '../gemini/index.js';
+import { getAllSkillMetadata, hasSkills } from './registry.js';
+import { SKILL_CONFIDENCE_THRESHOLD, type SkillDetectionResult } from './types.js';
 
 /**
  * JSON schema for the detector's structured output
@@ -66,7 +67,7 @@ export async function detectSkill(
   buildId: string,
   apiKey: string,
   model: string,
-  db: D1Database,
+  db: D1ToPgAdapter,
   baseUrl?: string,
 ): Promise<{ skillId: string | null; confidence: number }> {
   // Skip detection if no skills are registered

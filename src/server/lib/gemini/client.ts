@@ -1,3 +1,4 @@
+import type { D1ToPgAdapter } from '../../db.js';
 /**
  * Gemini API Client
  *
@@ -16,7 +17,7 @@ import type {
   GeminiAPIResponse,
   AgentType,
   AILogEntry,
-} from './types';
+} from './types.js';
 
 const DEFAULT_MODEL = 'gemini-2.5-flash-lite-preview-06-2025';
 const DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
@@ -245,7 +246,7 @@ export function createAILogEntry(
 /**
  * Save an AI log entry to the database
  */
-export async function saveAILog(db: D1Database, log: AILogEntry): Promise<void> {
+export async function saveAILog(db: D1ToPgAdapter, log: AILogEntry): Promise<void> {
   await db
     .prepare(
       `INSERT INTO ai_logs (id, build_id, agent_type, request_prompt, response_json, prompt_tokens, completion_tokens, latency_ms, success, error_message)

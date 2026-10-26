@@ -4,7 +4,7 @@
  * Exports all AI agent services for BuildMate.
  */
 
-export * from "./structure";
-export * from "./options";
-export * from "./existingItems";
-export * from "./setupSteps";
+export * from "./structure/index.js";
+export * from "./options/index.js";
+export * from "./existingItems/index.js";
+export * from "./setupSteps/index.js";

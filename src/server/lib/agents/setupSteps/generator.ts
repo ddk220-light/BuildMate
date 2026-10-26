@@ -1,3 +1,4 @@
+import type { D1ToPgAdapter } from '../../../db.js';
 /**
  * Setup Steps Generator Service
  *
@@ -5,14 +6,14 @@
  * 3-5 functional setup steps for a completed build.
  */
 
-import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini";
+import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini/index.js";
 import {
   setupStepsSchema,
   type SetupStepsOutput,
-} from "../../gemini/schemas";
-import { getSkillSectionsForAgent } from "../../skills";
-import { SETUP_STEPS_SYSTEM_PROMPT, buildUserPrompt } from "./prompt";
-import type { SetupStepsContext } from "./context";
+} from "../../gemini/schemas.js";
+import { getSkillSectionsForAgent } from "../../skills/index.js";
+import { SETUP_STEPS_SYSTEM_PROMPT, buildUserPrompt } from "./prompt.js";
+import type { SetupStepsContext } from "./context.js";
 
 /**
  * Input for the Setup Steps Generator
@@ -39,9 +40,9 @@ export interface SetupStepsGeneratorResult {
  */
 export class SetupStepsGenerator {
   private client: GeminiClient;
-  private db: D1Database;
+  private db: D1ToPgAdapter;
 
-  constructor(apiKey: string, model: string, db: D1Database, baseUrl?: string) {
+  constructor(apiKey: string, model: string, db: D1ToPgAdapter, baseUrl?: string) {
     this.client = new GeminiClient({
       apiKey,
       model,

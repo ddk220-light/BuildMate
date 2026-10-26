@@ -1,3 +1,4 @@
+import type { D1ToPgAdapter } from '../../../db.js';
 /**
  * Option Generator Service
  *
@@ -5,16 +6,16 @@
  * 3 product options for a component, differentiated by functionality/use case.
  */
 
-import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini";
+import { GeminiClient, createAILogEntry, saveAILog } from "../../gemini/index.js";
 import {
   optionGeneratorSchema,
   type OptionGeneratorOutput,
-} from "../../gemini/schemas";
+} from "../../gemini/schemas.js";
 import {
   OPTION_GENERATOR_SYSTEM_PROMPT,
   buildUserPrompt,
   type OptionGeneratorContext,
-} from "./prompt";
+} from "./prompt.js";
 
 /**
  * Input for the Option Generator
@@ -40,9 +41,9 @@ export interface OptionGeneratorResult {
  */
 export class OptionGenerator {
   private client: GeminiClient;
-  private db: D1Database;
+  private db: D1ToPgAdapter;
 
-  constructor(apiKey: string, model: string, db: D1Database, baseUrl?: string) {
+  constructor(apiKey: string, model: string, db: D1ToPgAdapter, baseUrl?: string) {
     this.client = new GeminiClient({
       apiKey,
       model,

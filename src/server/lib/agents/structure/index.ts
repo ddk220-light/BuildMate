@@ -4,9 +4,9 @@
  * Exports the Structure Generator service and related types.
  */
 
-export { StructureGenerator } from './generator';
+export { StructureGenerator } from './generator.js';
 export type {
   StructureGeneratorInput,
   StructureGeneratorResult,
-} from './generator';
-export { STRUCTURE_GENERATOR_SYSTEM_PROMPT, buildUserPrompt } from './prompt';
+} from './generator.js';
+export { STRUCTURE_GENERATOR_SYSTEM_PROMPT, buildUserPrompt } from './prompt.js';

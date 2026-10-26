@@ -5,13 +5,13 @@
  * text about existing components.
  */
 
-export { ExistingItemsParser } from "./parser";
+export { ExistingItemsParser } from "./parser.js";
 export type {
   ParsedItem,
   ExistingItemsParserInput,
   ExistingItemsParserResult,
-} from "./parser";
+} from "./parser.js";
 export {
   EXISTING_ITEMS_PARSER_SYSTEM_PROMPT,
   buildExistingItemsPrompt,
-} from "./prompt";
+} from "./prompt.js";
